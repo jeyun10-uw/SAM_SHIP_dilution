@@ -14,6 +14,7 @@ subroutine readiopdata( error_code )
                   tsnd_upwind, qsnd_upwind, o3snd_mmr, &
                   nlsf, nzlsf, dayls,  ugls, vgls, wgls, dqls, dtls, pls, zls, &
                   pres0ls, utraj_ls, vtraj_ls, &
+                  AccumAerosolNumb_snd_ref, AccumAerosolNumber_snd_ref, &
                   AccumAerosolMass_snd, AccumAerosolNumber_snd, &
                   AitkenAerosolMass_snd, AitkenAerosolNumber_snd, &
                   deltaDVapor_snd, deltaO18Vapor_snd, deltaO17Vapor_snd, &
@@ -688,6 +689,8 @@ subroutine readiopdata( error_code )
      allocate(tmp_aer_in(ntime,nlev), &
           AccumAerosolNumber_snd(nlev_in,ntime), & !bloss: nlev_in to match dimensions of psnd, etc.
           AccumAerosolMass_snd(nlev_in,ntime), &
+          AccumAerosolNumber_snd_ref(nlev_in,ntime), & !chun: new variables for reference NAc 
+          AccumAerosolMass_snd_ref(nlev_in,ntime), &
           AitkenAerosolNumber_snd(nlev_in,ntime), &
           AitkenAerosolMass_snd(nlev_in,ntime), &
           STAT=status)
@@ -722,6 +725,36 @@ subroutine readiopdata( error_code )
            AccumAerosolMass_snd(2:nlev+1,n) = tmp_aer_in(n,nlev:1:-1)
          else
            AccumAerosolMass_snd(1:nlev,n) = tmp_aer_in(n,nlev:1:-1)
+         end if
+       end do
+     end if
+
+     AccumAerosolNumber_snd_ref(:,:) = missing_value
+     call get_netcdf_var2d_real( ncid,'Na_accum_ref',ntime,nlev,tmp_aer_in, &
+          use_nf_real,status,.false.)
+     if(status.eq.NF_NOERR) then
+       do n = 1,ntime
+         if(get_add_surface_data) then
+           !bloss(2020-06): Add level at surface to match psnd, zsnd, etc.
+           AccumAerosolNumber_snd_ref(1,n) = tmp_aer_in(n,nlev)
+           AccumAerosolNumber_snd_ref(2:nlev+1,n) = tmp_aer_in(n,nlev:1:-1)
+         else
+           AccumAerosolNumber_snd_ref(1:nlev,n) = tmp_aer_in(n,nlev:1:-1)
+         end if
+       end do
+     end if
+
+     AccumAerosolMass_snd_ref(:,:) = missing_value
+     call get_netcdf_var2d_real( ncid,'qa_accum_ref',ntime,nlev,tmp_aer_in, &
+          use_nf_real,status,.false.)
+     if(status.eq.NF_NOERR) then
+       do n = 1,ntime
+         if(get_add_surface_data) then
+           !bloss(2020-06): Add level at surface to match psnd, zsnd, etc.
+           AccumAerosolMass_snd_ref(1,n) = tmp_aer_in(n,nlev)
+           AccumAerosolMass_snd_ref(2:nlev+1,n) = tmp_aer_in(n,nlev:1:-1)
+         else
+           AccumAerosolMass_snd_ref(1:nlev,n) = tmp_aer_in(n,nlev:1:-1)
          end if
        end do
      end if
