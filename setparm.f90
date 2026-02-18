@@ -49,6 +49,7 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 edge_frac_min, & !added hyperviscosity option
                 edge_frac_max, & !added hyperviscosity option
                 nz_offset, & !added hyperviscosity option
+                track_spreading_rate, & !added ship track dilution option 
                 doscamiopdata, iopfile, dozero_out_day0, &
                 use_scam_reference_sounding, set_obs_to_reference_sounding, &
                 use_scam_reference_sounding_for_wtg, use_scam_initial_sounding, & !bloss(2018-11-30/2019-02-22)
