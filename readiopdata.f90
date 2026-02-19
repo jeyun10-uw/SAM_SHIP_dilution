@@ -14,7 +14,7 @@ subroutine readiopdata( error_code )
                   tsnd_upwind, qsnd_upwind, o3snd_mmr, &
                   nlsf, nzlsf, dayls,  ugls, vgls, wgls, dqls, dtls, pls, zls, &
                   pres0ls, utraj_ls, vtraj_ls, &
-                  AccumAerosolNumb_snd_ref, AccumAerosolNumber_snd_ref, &
+                  AccumAerosolMass_snd_ref, AccumAerosolNumber_snd_ref, &
                   AccumAerosolMass_snd, AccumAerosolNumber_snd, &
                   AitkenAerosolMass_snd, AitkenAerosolNumber_snd, &
                   deltaDVapor_snd, deltaO18Vapor_snd, deltaO17Vapor_snd, &
