@@ -14,7 +14,7 @@ module microphysics
 
 use params, only: rgas, rv, cp, lcond, lsub, fac_cond, fac_sub, ggr, &
      ug, vg, & ! domain advection velocities for ship plume.
-     pi, doprecip, docloud
+  pi, doprecip, docloud, doShipDilution
 
 use src_scavenging, only: memory, init_scavenging, m2011_scavenging, scav_cloud_2m, qxeps
 use aerosol_utils, only: DryAerosolMassFraction, PartitionAerosolMass
@@ -42,6 +42,7 @@ use vars, only: pres, rho, dtn, w, t, tabs, qv, qcl, qpl, qci, qpi, &
      condavg_mask, ncondavg, condavgname, condavglongname, &
      nstep, nstatis, nprint, icycle, total_water_prec, &
      AccumAerosolMass_snd, AccumAerosolNumber_snd, &
+     AccumAerosolMass_snd_ref, AccumAerosolNumber_snd_ref, &
      nsnd,nzsnd,daysnd,zsnd,psnd
      
 use domain, only: YES3D     
@@ -50,6 +51,8 @@ use micro_params
 use radar_simulator_types, only: class_param
 
 implicit none
+
+integer :: inaccr = -1, iqaccr = -1
 
 logical :: isallocatedMICRO = .false., isallocatedSCAV3D = .false., isallocatedMKBUDGET = .false.
 
@@ -660,7 +663,7 @@ subroutine micro_init()
 
   implicit none
   
-  real, dimension(nzm) :: qc0, rh0, Na_accum, qa_accum
+  real, dimension(nzm) :: qc0, rh0, Na_accum, qa_accum, Na_accum_ref, qa_accum_ref
   real :: tmp_pgam, tmp_lambda
 
   real, external :: satadj_water, qsatw
