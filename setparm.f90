@@ -72,10 +72,11 @@ NAMELIST /UWOPTIONS/ rad_simple_fluxdiv1, &
      Derbyshire_theta0, Derbyshire_LapseRate, &
      Derbyshire_tau, compute_advection_everywhere, &
      dowtg_blossey_etal_JAMES2009, &
+     lambda_ship_track, lambda_cf, print_lambda, &
      dowtg_qnudge, itau_wtg_qnudge, &
      dowtg_tnudge, itau_wtg_tnudge,  taulz_wtg_tnudge, &
      tauz0_wtg_qnudge, taulz_wtg_qnudge, &
-     am_wtg, am_wtg_exp, lambda_wtg, wtg_end_time, wtg_end_ramp, &
+     am_wtg, am_wtg_exp, lambda_wtg, lambda_wtg_min, wtg_start_time, wtg_start_ramp, wtg_end_time, wtg_end_ramp, pres_trop, lambda_ship_track_start_time, lambda_ship_track_rate, &
      nudge_to_sounding_winds, &
      doSmoothDamping, zbot_SmoothDamping, tau_SmoothDamping, &
      doenforce_cgils_qfloor, ztop_qfloor, qfloor, tau_qfloor, &
