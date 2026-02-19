@@ -244,7 +244,8 @@ module micro_params
   ! =========== PROGNOSTIC AEROSOL PROCESSES ============
   integer, parameter :: nmicro_process_rates_progaer_mass = 7
   integer, parameter :: nmicro_process_rates_progaer_number = 2
-  integer, parameter :: nmicro_process_rates_dilution = 2
+  integer, parameter :: nmicro_process_rates_dilution_mass = 1
+  integer, parameter :: nmicro_process_rates_dilution_number = 1
 
   character(len=8), dimension(nmicro_process_rates_progaer_mass), parameter, public :: &
        micro_process_rate_names_progaer_mass = (/ &
@@ -259,11 +260,13 @@ module micro_params
        micro_process_rate_names_progaer_number = (/ &
           'NADPOSLIM', & ! CHANGE IN DRY AEROSOL NUMBER DUE TO POSITIVE LIMITING
           'NADNEGLIM' /) ! CHANGE IN DRY AEROSOL NUMBER DUE TO NEGATIVE LIMITING
-  character(len=8), dimension(nmicro_process_rates_dilution), parameter, public :: &
-       micro_process_rate_names_dilution = (/ &
-          'NACDILUTION', & ! CHANGE IN ACCUM AEROSOL NUMBER DUE TO SHIP DILUTION
+  character(len=8), dimension(nmicro_process_rates_dilution_mass), parameter, public :: &
+       micro_process_rate_names_dilution_mass = (/ &
           'QACDILUTION' /) ! CHANGE IN DRYUM AEROSOL MASS   DUE TO SHIP DILUTION
 
+  character(len=8), dimension(nmicro_process_rates_dilution_number), parameter, public :: &
+       micro_process_rate_names_dilution_number = (/ &
+          'NACDILUTION' /) ! CHANGE IN ACCUM AEROSOL NUMBER DUE TO SHIP DILUTION
 
   character(len=80), dimension(nmicro_process_rates_progaer_mass), parameter, public :: &
        micro_process_rate_longnames_progaer_mass = (/ &
@@ -278,12 +281,13 @@ module micro_params
        micro_process_rate_longnames_progaer_number = (/ &
        'NADPOSLIM, CHANGE IN DRY AEROSOL NUMBER DUE TO POSITIVE LIMITING                ', &
        'NADNEGLIM, CHANGE IN DRY AEROSOL NUMBER DUE TO NEGATIVE LIMITING                ' /)
-  character(len=80), dimension(nmicro_process_rates_dilution), parameter, public :: &
-       micro_process_rate_longnames_dilution = (/ &
-       'NACDILUTION, CHANGE IN ACCUM AEROSOL NUMBER DUE TO SHIP DILUTION                ', &
+  character(len=80), dimension(nmicro_process_rates_dilution_mass), parameter, public :: &
+       micro_process_rate_longnames_dilution_mass = (/ &
+       'NACDILUTION, CHANGE IN ACCUM AEROSOL NUMBER DUE TO SHIP DILUTION                ' /)
+
+  character(len=80), dimension(nmicro_process_rates_dilution_number), parameter, public :: &
+       micro_process_rate_longnames_dilution_number = (/ &
        'QACDILUTION, CHANGE IN ACCUM AEROSOL MASS DUE TO SHIP DILUTION                ' /)
-
-
   ! =========== COLD CLOUD PROCESSES ============
   integer, parameter :: nmicro_process_rates_cold_mass = 34
   integer, parameter :: nmicro_process_rates_cold_number = 29

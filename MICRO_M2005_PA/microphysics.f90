@@ -495,6 +495,11 @@ subroutine micro_setparm()
       nmicro_proc = nmicro_proc + nmicro_process_rates_progaer_mass &
            + nmicro_process_rates_progaer_number
     end if
+      if(doShipDilution) then
+      nmicro_proc = nmicro_proc + nmicro_process_rates_dilution_mass &
+           + nmicro_process_rates_dilution_number
+           
+    end if
     if(doicemicro) then
       nmicro_proc = nmicro_proc + nmicro_process_rates_cold_mass &
            + nmicro_process_rates_cold_number
@@ -3045,10 +3050,16 @@ if(do_output_micro_process_rates) then
   end if
 
   if(doShipDilution) then
-    do n = 1,nmicro_process_rates_dilution
+    do n = 1,nmicro_process_rates_dilution_mass
       call add_to_namelist(count,microcount, &
-           trim(micro_process_rate_names_dilution(n)), &
-           trim(micro_process_rate_longnames_dilution(n)), &
+           trim(micro_process_rate_names_dilution_mass(n)), &
+           trim(micro_process_rate_longnames_dilution_mass(n)), &
+           'g/kg/day',0)
+    end do
+    do n = 1,nmicro_process_rates_dilution_number
+      call add_to_namelist(count,microcount, &
+           trim(micro_process_rate_names_dilution_number(n)), &
+           trim(micro_process_rate_longnames_dilution_number(n)), &
            '#/mg/day',0)
     end do
   end if
@@ -3417,6 +3428,22 @@ if(do_output_micro_process_rates) then
            factor_xy*86400.*1.e-6) ! #/kg/s --> #/mg/day
     end do
     ioffset = ioffset + nmicro_process_rates_progaer_number
+  end if
+
+  if(doShipDilution) then
+    do n = 1,nmicro_process_rates_dilution_mass
+      tr0(1:nzm) = micro_proc_rates(1:nzm,ioffset+n)
+      call hbuf_put(TRIM(micro_process_rate_names_dilution_mass(n)),tr0, &
+           factor_xy*86400.*1.e3) ! kg/kg/s --> g/kg/day
+    end do
+    ioffset = ioffset + nmicro_process_rates_dilution_mass
+
+    do n = 1,nmicro_process_rates_dilution_number
+      tr0(1:nzm) = micro_proc_rates(1:nzm,ioffset+n)
+      call hbuf_put(TRIM(micro_process_rate_names_dilution_number(n)),tr0, &
+           factor_xy*86400.*1.e-6) ! #/kg/s --> #/mg/day
+    end do
+    ioffset = ioffset + nmicro_process_rates_dilution_number
   end if
 
   if(doicemicro) then
