@@ -406,6 +406,7 @@ subroutine micro_setparm()
      end if
   end if
   if(doprecip)    nmicro_fields = nmicro_fields + 2 ! add rain mass and number (if desired)
+  if(doShipDilution)    nmicro_fields = nmicro_fields + 2 ! add rain mass and number (if desired)
   if(doicemicro)  nmicro_fields = nmicro_fields + 4 ! add snow and cloud ice number and mass (if desired)
   if(dograupel)   nmicro_fields = nmicro_fields + 2 ! add graupel mass and number (if desired)
 
