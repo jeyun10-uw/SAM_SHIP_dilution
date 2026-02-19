@@ -52,8 +52,6 @@ use radar_simulator_types, only: class_param
 
 implicit none
 
-integer :: inaccr = -1, iqaccr = -1
-
 logical :: isallocatedMICRO = .false., isallocatedSCAV3D = .false., isallocatedMKBUDGET = .false.
 
 integer :: nmicro_fields ! total number of prognostic water vars
@@ -1991,6 +1989,7 @@ do j = 1,ny
         if(doShipDilution) then
           tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
           tmpnacc(:) = tmpnacc(:)+ dtn*mtendnacc
+        end if
 
         !bloss(2020-11): Partition total (dry+wet) aerosol mass into
          !   dry aerosol mass and wet (in-cloud-droplet) aerosol mass
