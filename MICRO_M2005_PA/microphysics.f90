@@ -1845,10 +1845,10 @@ do j = 1,ny
 
       ! chun: mtendqacc, mtendnacc, tmpnacc_ref, tmpqacc_ref are added to calculate ship dilution
       call m2005micro_graupel(&
-           mtendqcl,mtendqci,mtendqs,mtendqr,mtendqad,mtendqaw,mtendqar,mtendqacc&
-           mtendncl,mtendnci,mtendns,mtendnr,mtendnad,mtendnacc&
-           tmpqcl,tmpqci,tmpqs,tmpqr,tmpqad,tmpqaw,tmpqar,tmpqacc_ref &
-           tmpncl,tmpnci,tmpns,tmpnr,tmpnad,tmpnuc,tmpnur,tmpnacc_ref        &
+           mtendqcl,mtendqci,mtendqs,mtendqr,mtendqad,mtendqaw,mtendqar,mtendqacc,&
+           mtendncl,mtendnci,mtendns,mtendnr,mtendnad,mtendnacc,&
+           tmpqcl,tmpqci,tmpqs,tmpqr,tmpqad,tmpqaw,tmpqar,tmpqacc_ref, &
+           tmpncl,tmpnci,tmpns,tmpnr,tmpnad,tmpnuc,tmpnur,tmpnacc_ref,        &
            tmtend1d,mtendqv, &
            tmptabs,tmpqv,tmppres,rho,tmpdz,tmpw,tmpwsub, &
            sfcpcp, sfcicepcp, &

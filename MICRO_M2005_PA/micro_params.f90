@@ -8,6 +8,7 @@ module micro_params
   integer :: iqv = -1, iqcl = -1, iqci = -1, iqr = -1, iqs = -1, iqg = -1 !bloss(2018-02): initialize to -1
   integer :: incl = -1, inci = -1, inr = -1, ins = -1, ing = -1
   integer :: iqacc = -1, inacc = -1, iqar = -1 !brnr/bloss: indices for prognostic aerosol scheme
+  integer :: iqaccr = -1, inaccr = -1 !brnr/bloss: indices for prognostic aerosol scheme
   integer :: iqad = -1, iqaw = -1, inad = -1 !brnr/bloss: indices for diagnostic aerosol scheme
 
   !bloss: added options that may be set in prm file namelist 

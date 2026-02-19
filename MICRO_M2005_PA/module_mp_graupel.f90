@@ -2647,6 +2647,7 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
                   ELSE
                      NACC3DTEN(K) = 0.
                      QACC3DTEN(K) = 0.
+                  ENDIF
                ENDIF
 
                QV3DTEN(K) = QV3DTEN(K)+(-PRE(K)-EVPMS(K)-EVPMG(K))
