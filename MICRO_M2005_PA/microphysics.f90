@@ -1247,12 +1247,12 @@ subroutine micro_init()
  end if
  
  if(doShipDilution) then
-      mkname(inaccr) = 'NAc_REF'
+      mkname(inaccr) = 'NAb'
       mklongname(inaccr) = 'REFERENCE NAc FOR DILUTION'
       mkunits(inaccr) = '#/mg'
       mkoutputscale(inaccr) = 1.e-6
       
-      mkname(iqaccr) = 'QAc_REF'
+      mkname(iqaccr) = 'QAb'
       mklongname(iqaccr) = 'REFERENCE NAc FOR DILUTION'
       mkunits(iqaccr) = 'g/kg'
       mkoutputscale(iqaccr) = 1.e3/massfactor
