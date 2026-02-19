@@ -2640,10 +2640,10 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
 
                ! CHUN: Calculate Dilution effects
                IF (doShipDilution) THEN
-                  track_width = track_spreading_rate * (day-shipv2_time0) * 24. * 3600.
+                  track_width = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
                   IF (track_width.GT.nx_gl*dx) THEN
-                     NACC3DTEN(K) = MAX(0., -(NAD3D(K)+NC3D (K)-NACC_REF(K)) * track_spreading_rate / (track_width) )
-                     QACC3DTEN(K) = MAX(0., -(QAD3D(K)+QAW3D(K)-NACC_REF(K)) * track_spreading_rate / (track_width) )
+                     NACC3DTEN(K) = MIN(0., -(NAD3D(K)+NC3D (K)-NACC_REF(K)) * 1.e3/3600.*track_spreading_rate / (track_width) )
+                     QACC3DTEN(K) = MIN(0., -(QAD3D(K)+QAW3D(K)-NACC_REF(K)) * 1.e3/3600.*track_spreading_rate / (track_width) )
                   ELSE
                      NACC3DTEN(K) = 0.
                      QACC3DTEN(K) = 0.
