@@ -281,12 +281,12 @@ module micro_params
        micro_process_rate_longnames_progaer_number = (/ &
        'NADPOSLIM, CHANGE IN DRY AEROSOL NUMBER DUE TO POSITIVE LIMITING                ', &
        'NADNEGLIM, CHANGE IN DRY AEROSOL NUMBER DUE TO NEGATIVE LIMITING                ' /)
-  character(len=80), dimension(nmicro_process_rates_dilution_mass), parameter, public :: &
-       micro_process_rate_longnames_dilution_mass = (/ &
-       'NACDILUTION, CHANGE IN ACCUM AEROSOL NUMBER DUE TO SHIP DILUTION                ' /)
-
   character(len=80), dimension(nmicro_process_rates_dilution_number), parameter, public :: &
        micro_process_rate_longnames_dilution_number = (/ &
+       'NACDILUTION, CHANGE IN ACCUM AEROSOL NUMBER DUE TO SHIP DILUTION                ' /)
+
+  character(len=80), dimension(nmicro_process_rates_dilution_mass), parameter, public :: &
+       micro_process_rate_longnames_dilution_mass = (/ &
        'QACDILUTION, CHANGE IN ACCUM AEROSOL MASS DUE TO SHIP DILUTION                ' /)
   ! =========== COLD CLOUD PROCESSES ============
   integer, parameter :: nmicro_process_rates_cold_mass = 34

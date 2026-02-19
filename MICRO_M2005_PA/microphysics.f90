@@ -733,6 +733,12 @@ subroutine micro_init()
     flag_advect(iqaw) = 0
   end if
 
+  if(doShipDilution) then
+    flag_advect(inaccr) = 0
+    flag_advect(iqaccr) = 0
+
+  end if
+
 !!$  ! initialize flag arrays
 !!$  if(dopredictNc) then
 !!$     ! Cloud droplet number concentration is a prognostic variable
@@ -1239,6 +1245,19 @@ subroutine micro_init()
        mkoutputscale(iqar) = 1.e3/massfactor
     end if
  end if
+ 
+ if(doShipDilution) then
+      mkname(inaccr) = 'NAc_REF'
+      mklongname(inaccr) = 'REFERENCE NAc FOR DILUTION'
+      mkunits(inaccr) = '#/mg'
+      mkoutputscale(inaccr) = 1.e-6
+      
+      mkname(iqaccr) = 'QAc_REF'
+      mklongname(iqaccr) = 'REFERENCE NAc FOR DILUTION'
+      mkunits(iqaccr) = 'g/kg'
+      mkoutputscale(iqaccr) = 1.e3/massfactor
+  end if
+      
   
   if(doprecip) then
      mkname(iqr) = 'QR'
