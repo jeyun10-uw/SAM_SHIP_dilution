@@ -91,7 +91,7 @@ MODULE module_mp_GRAUPEL
 !  USE module_state_description
   ! parameters from SAM and options from wrapper routine.
 use params, only: lcond, lsub, cp, rgas, rv, track_spreading_rate, doShipDilution, use_scam_track_width_spreading_rate ! chun: track_spreading_rate is added
-   use grid, only: dx, day, masterproc
+   use grid, only: dx, day, masterproc, nstep, nstat
    use vars, only: nsfc, daysfc, track_width, spreading_rate 
    use domain
    use micro_params
@@ -2665,7 +2665,9 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
                   IF (track_width0.GT.nx_gl*dx) THEN
                      NACC3DTEN(K) = MIN(0., -(NAD3D(K)+NC3D (K)-NACC_REF(K)) * spreading_rate0 / (track_width0) )
                      QACC3DTEN(K) = MIN(0., -(QAD3D(K)+QAW3D(K)-NACC_REF(K)) * spreading_rate0 / (track_width0) )
-                     if(masterproc) write(*,*) 'track_width, spreading_rate = ', track_width0, spreading_rate 
+                     if(mod(nstep,nstat).eq.0) then
+                        if(masterproc) write(*,*) 'day, track_width, spreading_rate = ',day, track_width0, spreading_rate0 
+                     endif
                   ELSE
                      NACC3DTEN(K) = 0.
                      QACC3DTEN(K) = 0.
