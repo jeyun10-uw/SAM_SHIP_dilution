@@ -30,6 +30,7 @@ real, external :: erfff
 
 real tmp_lwp
 real :: cld_mean
+real :: track_width0
 
 call t_startf ('forcing')
 
@@ -327,7 +328,7 @@ if(dolargescale.and.time.gt.timelargescale) then
 
        ! Change lambda_wtg when lambda_ship_track is true
        
-       cld_mean=0.
+       cld_mean=1.
        
        if(lambda_ship_track) then
           if(lambda_cf) then
@@ -348,14 +349,28 @@ if(dolargescale.and.time.gt.timelargescale) then
             if (cld_mean.lt.1e-5) then
               cld_mean=0.01
             end if
-
-            lambda_wtg = MAX(lambda_wtg_min,cld_mean * lambda_ship_track_rate * (day - lambda_ship_track_start_time))
             if(print_lambda) then
               print *, 'Mean cloud fraction = ', cld_mean, 'lambda_wtg = ', lambda_wtg
             end if
           else
-            lambda_wtg = MAX(lambda_wtg_min,lambda_ship_track_rate * (day - lambda_ship_track_start_time))
+            cld_mean =1.
           end if
+
+          if(use_scam_track_width_spreading_rate) then
+            nn=1
+            do i=1,nsfc-1
+              if(day.gt.daysfc(i)) then
+                nn=i
+              endif
+            end do
+             
+            coef=(day-daysfc(nn))/(daysfc(nn+1)-daysfc(nn))
+            track_width0=track_width(nn)+(track_width(nn+1)-track_width(nn))*coef
+
+          else
+            track_width0 = lambda_ship_track_rate * (day - lambda_ship_track_start_time)
+          end if
+          lambda_wtg = MAX(lambda_wtg_min,cld_mean * track_width0)
        end if
 
        call wtg_james2009(nzm, 100.*pres, tabs_ref_in, qv_ref_in, tabs0, qv0, qn0+qp0, &

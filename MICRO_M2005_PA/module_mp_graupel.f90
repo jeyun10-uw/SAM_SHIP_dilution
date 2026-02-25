@@ -92,6 +92,7 @@ MODULE module_mp_GRAUPEL
   ! parameters from SAM and options from wrapper routine.
 use params, only: lcond, lsub, cp, rgas, rv, track_spreading_rate, doShipDilution ! chun: track_spreading_rate is added
    use grid, only: dx, day
+   use vars, only: daysfc, track_width, spreading_rate 
    use domain
    use micro_params
    use aerosol_utils, only: DryAerosolMassFraction
@@ -1216,7 +1217,8 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
 ! MODEL INPUT PARAMETERS (FORMERLY IN COMMON BLOCKS)
 
         REAL DT         ! MODEL TIME STEP (SEC)
-        REAL track_width
+        REAL track_width0
+        REAL spreading_rate0
 
         integer, intent(in)  :: n_proc_extra
         logical, intent(in) :: do_proc_extra
@@ -2640,10 +2642,26 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
 
                ! CHUN: Calculate Dilution effects
                IF (doShipDilution) THEN
-                  track_width = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
-                  IF (track_width.GT.nx_gl*dx) THEN
-                     NACC3DTEN(K) = MIN(0., -(NAD3D(K)+NC3D (K)-NACC_REF(K)) * 1.e3/3600.*track_spreading_rate / (track_width) )
-                     QACC3DTEN(K) = MIN(0., -(QAD3D(K)+QAW3D(K)-NACC_REF(K)) * 1.e3/3600.*track_spreading_rate / (track_width) )
+                  if(use_scam_track_width_spreading_rate) then
+                     nn=1
+                     do i=1,nsfc-1
+                       if(day.gt.daysfc(i)) then
+                         nn=i
+                       endif
+                     end do
+                      
+                     coef=(day-daysfc(nn))/(daysfc(nn+1)-daysfc(nn))
+                     track_width0=track_width(nn)+(track_width(nn+1)-track_width(nn))*coef
+                     spreading_rate0=spreading_rate(nn)+(spreading_rate(nn+1)-spreading_rate(nn))*coef
+
+                  else
+                     track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
+                     spreading_rate0 = track_spreading_rate
+                  end if
+
+                  IF (track_width0.GT.nx_gl*dx) THEN
+                     NACC3DTEN(K) = MIN(0., -(NAD3D(K)+NC3D (K)-NACC_REF(K)) * 1.e3/3600.*spreading_rate0 / (track_width0) )
+                     QACC3DTEN(K) = MIN(0., -(QAD3D(K)+QAW3D(K)-NACC_REF(K)) * 1.e3/3600.*spreading_rate0 / (track_width0) )
                   ELSE
                      NACC3DTEN(K) = 0.
                      QACC3DTEN(K) = 0.

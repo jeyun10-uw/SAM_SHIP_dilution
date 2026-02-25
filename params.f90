@@ -117,6 +117,7 @@ logical:: dosmoke = .false.
 logical:: notracegases = .false.
 logical:: doseawater = .true. !bloss(Set UW default to true!!) .false.
 logical:: doShipDilution = .false.
+logical:: use_scam_track_width_spreading_rate = .false.
 
 !mcmic: hyperdiffusion for large grid spacing runs in hopes of damping TKE
 !and decreasing excessive entrainment

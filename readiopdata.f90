@@ -17,13 +17,14 @@ subroutine readiopdata( error_code )
                   AccumAerosolMass_snd_ref, AccumAerosolNumber_snd_ref, &
                   AccumAerosolMass_snd, AccumAerosolNumber_snd, &
                   AitkenAerosolMass_snd, AitkenAerosolNumber_snd, &
+                  track_width, spreading_rate, &
                   deltaDVapor_snd, deltaO18Vapor_snd, deltaO17Vapor_snd, &
                   deltaDVapor_ref, deltaO18Vapor_ref, deltaO17Vapor_ref
   use grid, only: nzm, z, case, masterproc, rank, & 
        dozero_out_day0, iopfile, wgls_holds_omega, &
        isInitialized_scamiopdata
   use params, only: rgas, cp, fac_cond, fac_sub, longitude0, latitude0, &
-       SFC_FLX_FXD, dosubsidence
+       SFC_FLX_FXD, dosubsidence, use_scam_track_width_spreading_rate
 
   
 !-----------------------------------------------------------------------
@@ -105,6 +106,7 @@ subroutine readiopdata( error_code )
    real(4), allocatable       :: lon_in(:), lat_in(:), dplevs(:), & ! dimensions
                                  shf_in(:), lhf_in(:), Tg_in(:), &
                                  Ts_in(:), Ps_in(:), tmp_srf(:), &
+                                 track_width_in(:), spreading_rate_in(:), &
                                  tausrf_in(:), utraj_in(:), vtraj_in(:)  ! vars
 
    ! soundings, omega, advective tendencies (only function of time, lev here)
@@ -271,6 +273,7 @@ subroutine readiopdata( error_code )
    ALLOCATE(shf_in(ntime), lhf_in(ntime), Tg_in(ntime), Ts_in(ntime), &
         Ps_in(ntime), tmp_srf(ntime), tausrf_in(ntime), &
         utraj_in(ntime), vtraj_in(ntime), & !bloss(2018-11-29)
+        track_width_in(ntime), spreading_rate_in(ntime), & !chun(2026-02-24)
         STAT=status)
 
    shf_in(:) = missing_value
@@ -281,6 +284,8 @@ subroutine readiopdata( error_code )
    tausrf_in(:) = missing_value
    utraj_in(:) = missing_value !bloss(2018-11-29)
    vtraj_in(:) = missing_value !bloss(2018-11-29)
+   track_width_in(:) = missing_value !chun(2026-02-24)
+   speading_rate_in(:) = missing_value !chun(2026-02-24)
 
    if(status.ne.0) then
       write(6,*) 'Could not allocate surface variables in readiopdata'
@@ -336,6 +341,13 @@ subroutine readiopdata( error_code )
 
    ! surface pressure
    call get_netcdf_var1d_real( ncid, 'Ps', Ps_in, use_nf_real, status, .true.)
+
+   ! ground/sea surface temperature
+   if(use_scam_track_width_spreading_rate) then
+      call get_netcdf_var1d_real( ncid, 'track_width', track_width_in, use_nf_real, status,.false.)
+      call get_netcdf_var1d_real( ncid, 'spreading_rate', spreading_rate_in, use_nf_real, status,.false.)
+   end if 
+
 !         
 !====================================================================
 !     check whether surface pressure exceeds largest pressure
@@ -949,6 +961,7 @@ subroutine readiopdata( error_code )
         zls(nzlsf,nlsf),pls(nzlsf,nlsf),pres0ls(nlsf),dayls(nlsf),&
         utraj_ls(nlsf),vtraj_ls(nlsf), &
         daysfc(nsfc),sstsfc(nsfc),shsfc(nsfc),lhsfc(nsfc),&
+        track_width(nsfc),spreading_rate(nsfc),& ! chun: track width and spreading rate
         tausfc(nsfc), STAT=ierr)
    if(ierr.NE.0) then
       if(masterproc) then
@@ -969,6 +982,10 @@ subroutine readiopdata( error_code )
       sstsfc(i) = Tg_in(i)
       shsfc(i)   = shf_in(i)
       lhsfc(i)  = lhf_in(i)
+      if(use_scam_track_width_spreading_rate) then
+         track_wdith(i) = track_width_in(i)
+         spreading_rate(i) = spreading_rate_in(i)
+      end if
       if(have_tausrf) then
          tausfc(i) = sqrt(tausrf_in(i)) !!!!! ????????FIX THIS?????? !!!!!
       else
@@ -1263,6 +1280,10 @@ subroutine readiopdata( error_code )
          tausfc(i) = sqrt(tausrf_in(i)) !!!!! FIX THIS !!!!!
       else
          tausfc(i) = 0.
+      end if
+      if(use_scam_track_width_spreading_rate) then
+         track_width(i) = track_width_in(i)
+         spreading_rate(i) = spreading_rate_in(i)
       end if
    end do
 

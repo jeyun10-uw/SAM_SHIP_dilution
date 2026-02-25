@@ -121,12 +121,14 @@ real, allocatable :: o3snd_mmr(:,:) ! Ozone sounding (mass mixing ratio) input f
 real, allocatable :: zsnd(:,:) ! Height
 real, allocatable :: psnd(:,:) ! Pressure
 real, allocatable :: daysnd(:) ! number of sounding samples
+real, allocatable :: track_width(:) ! number of sounding samples
+real, allocatable :: spreading_rate(:) ! number of sounding samples
  
 !bloss(2019-10): Aerosol sounding input through IOP netcdf file
 real, allocatable :: AccumAerosolMass_snd(:,:)   ! mass mixing ratio (kg/kg) of accumulation mode aerosol
 real, allocatable :: AccumAerosolNumber_snd(:,:) ! number mixing ratio (#/kg) of accumulation mode aerosol
-real, allocatable :: AccumAerosolMass_snd_ref(:,:)   ! Same as AccumAerosolMass_snd, but for reference to calculate lateral diultion 
-real, allocatable :: AccumAerosolNumber_snd_ref(:,:) ! Same as AccumAerosolNumber_snd, but for reference to calculate lateral diultion
+real, allocatable :: AccumAerosolMass_snd_ref(:,:)   !chun: Same as AccumAerosolMass_snd, but for reference to calculate lateral diultion 
+real, allocatable :: AccumAerosolNumber_snd_ref(:,:) !chun: Same as AccumAerosolNumber_snd, but for reference to calculate lateral diultion
 real, allocatable :: AitkenAerosolMass_snd(:,:)   ! mass mixing ratio (kg/kg) of aitken mode aerosol
 real, allocatable :: AitkenAerosolNumber_snd(:,:) ! number mixing ratio (#/kg) of aitken mode aerosol
 

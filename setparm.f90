@@ -43,6 +43,7 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 doSAMconditionals, dosatupdnconditionals, &
                 doShipTrackConditionals, & !added option for ship track stats
                 doShipDilution, & !added option for ship track stats
+                use_scam_track_width_spreading_rate, & !added option for ship track stats
                 doMomentumHyperviscosity, & !added hyperviscosity option
                 tau_MomentumHyperviscosity, & !added hyperviscosity option
                 fixed_delta, & !added hyperviscosity option

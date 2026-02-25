@@ -3450,12 +3450,6 @@ if(do_output_micro_process_rates) then
   end if
 
   if(doShipDilution) then
-    do n = 1,nmicro_process_rates_dilution_mass
-      tr0(1:nzm) = micro_proc_rates(1:nzm,ioffset+n)
-      call hbuf_put(TRIM(micro_process_rate_names_dilution_mass(n)),tr0, &
-           factor_xy*86400.*1.e3) ! kg/kg/s --> g/kg/day
-    end do
-    ioffset = ioffset + nmicro_process_rates_dilution_mass
 
     do n = 1,nmicro_process_rates_dilution_number
       tr0(1:nzm) = micro_proc_rates(1:nzm,ioffset+n)
@@ -3463,6 +3457,13 @@ if(do_output_micro_process_rates) then
            factor_xy*86400.*1.e-6) ! #/kg/s --> #/mg/day
     end do
     ioffset = ioffset + nmicro_process_rates_dilution_number
+
+    do n = 1,nmicro_process_rates_dilution_mass
+      tr0(1:nzm) = micro_proc_rates(1:nzm,ioffset+n)
+      call hbuf_put(TRIM(micro_process_rate_names_dilution_mass(n)),tr0, &
+           factor_xy*86400.*1.e3) ! kg/kg/s --> g/kg/day
+    end do
+    ioffset = ioffset + nmicro_process_rates_dilution_mass
   end if
 
   if(doicemicro) then
