@@ -90,15 +90,17 @@ MODULE module_mp_GRAUPEL
 
 !  USE module_state_description
   ! parameters from SAM and options from wrapper routine.
-use params, only: lcond, lsub, cp, rgas, rv, track_spreading_rate, doShipDilution ! chun: track_spreading_rate is added
+use params, only: lcond, lsub, cp, rgas, rv, track_spreading_rate, doShipDilution, use_scam_track_width_spreading_rate ! chun: track_spreading_rate is added
    use grid, only: dx, day
-   use vars, only: daysfc, track_width, spreading_rate 
+   use vars, only: nsfc, daysfc, track_width, spreading_rate 
    use domain
    use micro_params
    use aerosol_utils, only: DryAerosolMassFraction
 
    IMPLICIT NONE
 
+   integer nn,i
+   real coef
    REAL, PARAMETER :: PI = 3.1415926535897932384626434
    REAL, PARAMETER :: SQRTPI = 0.9189385332046727417803297
 
