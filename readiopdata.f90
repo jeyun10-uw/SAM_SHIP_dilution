@@ -285,7 +285,7 @@ subroutine readiopdata( error_code )
    utraj_in(:) = missing_value !bloss(2018-11-29)
    vtraj_in(:) = missing_value !bloss(2018-11-29)
    track_width_in(:) = missing_value !chun(2026-02-24)
-   speading_rate_in(:) = missing_value !chun(2026-02-24)
+   spreading_rate_in(:) = missing_value !chun(2026-02-24)
 
    if(status.ne.0) then
       write(6,*) 'Could not allocate surface variables in readiopdata'
@@ -983,7 +983,7 @@ subroutine readiopdata( error_code )
       shsfc(i)   = shf_in(i)
       lhsfc(i)  = lhf_in(i)
       if(use_scam_track_width_spreading_rate) then
-         track_wdith(i) = track_width_in(i)
+         track_width(i) = track_width_in(i)
          spreading_rate(i) = spreading_rate_in(i)
       end if
       if(have_tausrf) then
