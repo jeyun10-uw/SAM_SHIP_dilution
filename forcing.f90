@@ -30,7 +30,7 @@ real, external :: erfff
 
 real tmp_lwp
 real :: cld_mean
-real :: track_width0
+real :: track_width0, spreading_rate0
 
 call t_startf ('forcing')
 
@@ -366,6 +366,11 @@ if(dolargescale.and.time.gt.timelargescale) then
              
             coef=(day-daysfc(nn))/(daysfc(nn+1)-daysfc(nn))
             track_width0=track_width(nn)+(track_width(nn+1)-track_width(nn))*coef
+            spreading_rate0=spreading_rate(nn)+(spreading_rate(nn+1)-spreading_rate(nn))*coef
+
+            if(mod(nstep,nstat).eq.0) then
+              if(masterproc) write(*,*) 'day, track_width, spreading_rate = ',day, track_width0, spreading_rate0 
+            endif
 
           else
             track_width0 = lambda_ship_track_rate * (day - lambda_ship_track_start_time)
