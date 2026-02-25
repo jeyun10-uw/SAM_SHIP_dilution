@@ -2656,14 +2656,16 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
                      track_width0=track_width(nn)+(track_width(nn+1)-track_width(nn))*coef
                      spreading_rate0=spreading_rate(nn)+(spreading_rate(nn+1)-spreading_rate(nn))*coef
 
+
                   else
                      track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
-                     spreading_rate0 = track_spreading_rate
+                     spreading_rate0 = 1.e3/3600*track_spreading_rate
                   end if
 
                   IF (track_width0.GT.nx_gl*dx) THEN
-                     NACC3DTEN(K) = MIN(0., -(NAD3D(K)+NC3D (K)-NACC_REF(K)) * 1.e3/3600.*spreading_rate0 / (track_width0) )
-                     QACC3DTEN(K) = MIN(0., -(QAD3D(K)+QAW3D(K)-NACC_REF(K)) * 1.e3/3600.*spreading_rate0 / (track_width0) )
+                     NACC3DTEN(K) = MIN(0., -(NAD3D(K)+NC3D (K)-NACC_REF(K)) * spreading_rate0 / (track_width0) )
+                     QACC3DTEN(K) = MIN(0., -(QAD3D(K)+QAW3D(K)-NACC_REF(K)) * spreading_rate0 / (track_width0) )
+                     if(masterproc) write(*,*) 'track_width, spreading_rate = ', track_width0, spreading_rate 
                   ELSE
                      NACC3DTEN(K) = 0.
                      QACC3DTEN(K) = 0.
