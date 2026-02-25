@@ -91,7 +91,7 @@ MODULE module_mp_GRAUPEL
 !  USE module_state_description
   ! parameters from SAM and options from wrapper routine.
 use params, only: lcond, lsub, cp, rgas, rv, track_spreading_rate, doShipDilution, use_scam_track_width_spreading_rate ! chun: track_spreading_rate is added
-   use grid, only: dx, day
+   use grid, only: dx, day, masterproc
    use vars, only: nsfc, daysfc, track_width, spreading_rate 
    use domain
    use micro_params
