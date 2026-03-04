@@ -44,7 +44,7 @@ use vars, only: pres, rho, dtn, w, t, tabs, qv, qcl, qpl, qci, qpi, &
      AccumAerosolMass_snd, AccumAerosolNumber_snd, &
      AccumAerosolMass_snd_ref, AccumAerosolNumber_snd_ref, NA_accum_ref_col, NAC_mean_edge,&
      track_width,&
-     nsnd,nzsnd,daysnd,zsnd,psnd
+     nsnd,nzsnd,daysnd,zsnd,psnd,nsfc,daysfc
      
 use domain, only: YES3D     
 use module_mp_GRAUPEL, only: GRAUPEL_INIT, M2005MICRO_GRAUPEL, polysvp
@@ -1655,6 +1655,9 @@ logical, parameter :: do_new_scavenge = .false.
 real :: scav_factor, scav_mass, scav_number
 real :: dry_aerosol_mass_before, dry_aerosol_number_before
 REAL track_width0
+real coef
+integer nn,i
+
 
 real, external :: qsatw
 
@@ -1739,6 +1742,7 @@ if(doShipDilution) then
        nzm,day,z,pres,tmpnacc_ref,.true.)
   call InterpolateFromForcings(nsnd,nzsnd,daysnd,zsnd,psnd,AccumAerosolMass_snd_ref, &
        nzm,day,z,pres,tmpqacc_ref,.true.)
+endif
 
 do j = 1,ny
    do i = 1,nx
@@ -2018,19 +2022,18 @@ do j = 1,ny
         if(doShipDilution) then
           if(doAutoDilutionStart) then
             NA_accum_ref_col = 0
-            do k = 1,nzm
                !shifting verticl grid to grid box center
-               do k = 1,nzm-1
-                  z_grid1(k) = (z(k+1) + z(k))/2.0
-               enddo
-               
-               !compute dz
-               if (k.eq.1) then
-                  z_diff1(k) = z_grid1(1)
-               else
-                  z_diff1(k) = z_grid1(k) - z_grid1(k-1)
-               endif
+            do k = 1,nzm-1
+               z_grid1(k) = (z(k+1) + z(k))/2.0
             enddo
+            
+            !compute dz
+            if (k.eq.1) then
+               z_diff1(k) = z_grid1(1)
+            else
+               z_diff1(k) = z_grid1(k) - z_grid1(k-1)
+            endif
+
             do k = 1,nz_offset !height_inv_offset(i,j)
               NA_accum_ref_col=NA_accum_ref_col + tmpnacc_ref(k)*(z_diff1(k))/z(nz_offset)
             enddo
