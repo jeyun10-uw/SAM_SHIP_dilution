@@ -14,7 +14,7 @@ module microphysics
 
 use params, only: rgas, rv, cp, lcond, lsub, fac_cond, fac_sub, ggr, &
      ug, vg, & ! domain advection velocities for ship plume.
-  pi, doprecip, docloud, doShipDilution
+  pi, doprecip, docloud, doShipDilutio, nz_offset, doAutoDilutionStart,dNA_plume_threshold,use_scam_track_width_spreading_rate, track_spreading_rate
 
 use src_scavenging, only: memory, init_scavenging, m2011_scavenging, scav_cloud_2m, qxeps
 use aerosol_utils, only: DryAerosolMassFraction, PartitionAerosolMass
@@ -42,7 +42,8 @@ use vars, only: pres, rho, dtn, w, t, tabs, qv, qcl, qpl, qci, qpi, &
      condavg_mask, ncondavg, condavgname, condavglongname, &
      nstep, nstatis, nprint, icycle, total_water_prec, &
      AccumAerosolMass_snd, AccumAerosolNumber_snd, &
-     AccumAerosolMass_snd_ref, AccumAerosolNumber_snd_ref, NA_accum_ref_col&
+     AccumAerosolMass_snd_ref, AccumAerosolNumber_snd_ref, NA_accum_ref_col, NAC_mean_edge,&
+     track_width,&
      nsnd,nzsnd,daysnd,zsnd,psnd
      
 use domain, only: YES3D     
@@ -1653,6 +1654,7 @@ logical, parameter :: do_new_scavenge = .false.
 
 real :: scav_factor, scav_mass, scav_number
 real :: dry_aerosol_mass_before, dry_aerosol_number_before
+REAL track_width0
 
 real, external :: qsatw
 
@@ -2024,7 +2026,7 @@ do j = 1,ny
                endif
             enddo
             do k = 1,nz_offset !height_inv_offset(i,j)
-              NA_accum_ref_col=NA_accum_ref_col + NA_accum_ref(k)*(z_diff1(k))/z(nz_offset)
+              NA_accum_ref_col=NA_accum_ref_col + Na_accum_ref(k)*(z_diff1(k))/z(nz_offset)
             enddo
             IF(NAC_mean_edge.GT.NA_accum_ref_col+dNA_plume_threshold) THEN
               tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
@@ -2032,6 +2034,19 @@ do j = 1,ny
             ENDIF
 
           else
+            if(use_scam_track_width_spreading_rate) then
+               nn=1
+               do i=1,nsfc-1
+                 if(day.gt.daysfc(i)) then
+                   nn=i
+                 endif
+               end do
+                
+               coef=(day-daysfc(nn))/(daysfc(nn+1)-daysfc(nn))
+               track_width0=track_width(nn)+(track_width(nn+1)-track_width(nn))*coef
+            else
+               track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
+            end if
             IF (track_width0.GT.nx_gl*dx) THEN
               tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
               tmpnacc(:) = tmpnacc(:)+ dtn*mtendnacc
