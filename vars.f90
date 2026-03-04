@@ -278,8 +278,8 @@ real tkediff(nx, ny, nzm) !advective transport of tke (resolved)
 real tkediss(nx, ny, nzm) !dissipation of tke (resolved)
 
 ! chun: variables for ship dilution
-real NA_accum_ref_col = 0.
-real NAC_mean_edge = 0.
+real :: NA_accum_ref_col = 0.
+real :: NAC_mean_edge = 0.
 ! END UW ADDITIONS
 !===========================================================================
 
