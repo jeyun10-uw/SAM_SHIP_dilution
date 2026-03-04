@@ -1656,7 +1656,7 @@ real :: scav_factor, scav_mass, scav_number
 real :: dry_aerosol_mass_before, dry_aerosol_number_before
 REAL track_width0
 real coef
-integer nn,i
+integer nn,isfc
 
 
 real, external :: qsatw
@@ -2045,9 +2045,9 @@ do j = 1,ny
           else
             if(use_scam_track_width_spreading_rate) then
                nn=1
-               do i=1,nsfc-1
-                 if(day.gt.daysfc(i)) then
-                   nn=i
+               do isfc=1,nsfc-1
+                 if(day.gt.daysfc(isfc)) then
+                   nn=isfc
                  endif
                end do
                 
