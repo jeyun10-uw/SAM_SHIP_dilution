@@ -43,6 +43,7 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 doSAMconditionals, dosatupdnconditionals, &
                 doShipTrackConditionals, & !added option for ship track stats
                 doShipDilution, & !added option for ship track stats
+                doAutoDilutionStart, & !added option for ship track stats
                 use_scam_track_width_spreading_rate, & !added option for ship track stats
                 doMomentumHyperviscosity, & !added hyperviscosity option
                 tau_MomentumHyperviscosity, & !added hyperviscosity option
@@ -50,6 +51,7 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 edge_frac_min, & !added hyperviscosity option
                 edge_frac_max, & !added hyperviscosity option
                 nz_offset, & !added hyperviscosity option
+                dNA_plume_threshold, & !added hyperviscosity option
                 track_spreading_rate, & !added ship track dilution option 
                 doscamiopdata, iopfile, dozero_out_day0, &
                 use_scam_reference_sounding, set_obs_to_reference_sounding, &

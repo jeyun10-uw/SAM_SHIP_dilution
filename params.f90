@@ -117,6 +117,7 @@ logical:: dosmoke = .false.
 logical:: notracegases = .false.
 logical:: doseawater = .true. !bloss(Set UW default to true!!) .false.
 logical:: doShipDilution = .false.
+logical:: doAutoDilutionStart = .false.
 logical:: use_scam_track_width_spreading_rate = .false.
 
 !mcmic: hyperdiffusion for large grid spacing runs in hopes of damping TKE
@@ -128,6 +129,7 @@ real:: edge_frac_min = 0.875 !time scale for damping (seconds)
 real:: edge_frac_max = 0.125 !time scale for damping (seconds)
 real:: track_spreading_rate = 2. ! Ship Track Spreading Rate (km/hr)
 integer:: nz_offset = 20 !time scale for damping (seconds)
+real:: dNA_plume_threshold = 10.e6 ! Ship Track Spreading Rate (km/hr)
 
 ! Specify solar constant and zenith angle for perpetual insolation.
 ! Based onn Tompkins and Graig (1998)

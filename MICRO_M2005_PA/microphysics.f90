@@ -42,7 +42,7 @@ use vars, only: pres, rho, dtn, w, t, tabs, qv, qcl, qpl, qci, qpi, &
      condavg_mask, ncondavg, condavgname, condavglongname, &
      nstep, nstatis, nprint, icycle, total_water_prec, &
      AccumAerosolMass_snd, AccumAerosolNumber_snd, &
-     AccumAerosolMass_snd_ref, AccumAerosolNumber_snd_ref, &
+     AccumAerosolMass_snd_ref, AccumAerosolNumber_snd_ref, NA_accum_ref_col&
      nsnd,nzsnd,daysnd,zsnd,psnd
      
 use domain, only: YES3D     
@@ -1648,6 +1648,7 @@ real*8, dimension(nx,nzm) :: hgt_matrix, p_matrix, t_matrix, rh_matrix, & ! inpu
      g_to_vol_in, g_to_vol_out
 real*8, dimension(nhclass,nx,nzm) :: hm_matrix, re_matrix, Np_matrix
 
+ real, dimension(nzm) :: z_grid, z_grid1, z_diff1 !correcting z grid
 logical, parameter :: do_new_scavenge = .false.
 
 real :: scav_factor, scav_mass, scav_number
@@ -2007,8 +2008,35 @@ do j = 1,ny
         tmpnacc(:) = tmpnad(:)+tmpncl(:)
 
         if(doShipDilution) then
-          tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
-          tmpnacc(:) = tmpnacc(:)+ dtn*mtendnacc
+          if(doAutoDilutionStart) then
+            NA_accum_ref_col = 0
+            do k = 1,nzm
+               !shifting verticl grid to grid box center
+               do k = 1,nzm-1
+                  z_grid1(k) = (z(k+1) + z(k))/2.0
+               enddo
+               
+               !compute dz
+               if (k.eq.1) then
+                  z_diff1(k) = z_grid1(1)
+               else
+                  z_diff1(k) = z_grid1(k) - z_grid1(k-1)
+               endif
+            enddo
+            do k = 1,nz_offset !height_inv_offset(i,j)
+              NA_accum_ref_col=NA_accum_ref_col + NA_accum_ref(k)*(z_diff1(k))/z(nz_offset)
+            enddo
+            IF(NAC_mean_edge.GT.NA_accum_ref_col+dNA_plume_threshold) THEN
+              tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
+              tmpnacc(:) = tmpnacc(:)+ dtn*mtendnacc
+            ENDIF
+
+          else
+            IF (track_width0.GT.nx_gl*dx) THEN
+              tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
+              tmpnacc(:) = tmpnacc(:)+ dtn*mtendnacc
+            ENDIF
+          endif
         end if
 
         !bloss(2020-11): Partition total (dry+wet) aerosol mass into
