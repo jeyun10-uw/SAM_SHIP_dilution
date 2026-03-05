@@ -1768,7 +1768,7 @@ if(doShipDilution) then
 
     !if(masterproc) then
 	!  print*, 'NA_accum_ref_col (#/mg)=', NA_accum_ref_col*1.e-6
-    !endif
+    endif
   endif
 endif
 
@@ -1892,6 +1892,8 @@ do j = 1,ny
       mtendnci = 0.
       mtendns = 0.
       mtendng = 0.
+      mtendnacc = 0.
+      mtendqacc = 0.
 
       tmtend1d = 0.
 

@@ -1117,8 +1117,10 @@ real :: relhobs(nzm)
 		if(doShipDilution.and.doAutoDilutionStart) then
 		  NAC_mean_edge = edge_min
 		  if(masterproc) then
+		    print*, 'Edge Min:',NAC_mean_edge*1.e-6
+		    print*, 'Reference: ',NAC_mean_edge*1.e-6
 		    IF(NAC_mean_edge.GT.NA_accum_ref_col+dNA_plume_threshold) THEN
-		      print*, 'NAC_mean_edge is greater than NA_accum_ref_col', NAC_mean_edge*1.e-6, NA_accum_ref_col*1.e-6
+		      print*, 'NAC_mean_edge is greater than NA_accum_ref_col'!, NAC_mean_edge*1.e-6, NA_accum_ref_col*1.e-6
 		    ENDIF
 		  endif
 		endif
