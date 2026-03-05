@@ -1654,7 +1654,7 @@ logical, parameter :: do_new_scavenge = .false.
 
 real :: scav_factor, scav_mass, scav_number
 real :: dry_aerosol_mass_before, dry_aerosol_number_before
-REAL NA_accum_ref_col0 = 0
+REAL NA_accum_ref_col0
 REAL track_width0
 real coef
 integer nn,isfc
@@ -1744,6 +1744,7 @@ if(doShipDilution) then
   call InterpolateFromForcings(nsnd,nzsnd,daysnd,zsnd,psnd,AccumAerosolMass_snd_ref, &
        nzm,day,z,pres,tmpqacc_ref,.true.)
   if(doAutoDilutionStart) then
+    NA_accum_ref_col0 = 0
        !shifting verticl grid to grid box center
     do k = 1,nzm-1
        z_grid1(k) = (z(k+1) + z(k))/2.0
