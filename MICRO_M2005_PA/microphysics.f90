@@ -1744,18 +1744,21 @@ if(doShipDilution) then
   call InterpolateFromForcings(nsnd,nzsnd,daysnd,zsnd,psnd,AccumAerosolMass_snd_ref, &
        nzm,day,z,pres,tmpqacc_ref,.true.)
   if(doAutoDilutionStart) then
-    NA_accum_ref_col0 = 0
+    NA_accum_ref_col0 = 0.
        !shifting verticl grid to grid box center
     do k = 1,nzm-1
        z_grid1(k) = (z(k+1) + z(k))/2.0
     enddo
     
     !compute dz
-    if (k.eq.1) then
-       z_diff1(k) = z_grid1(1)
-    else
-       z_diff1(k) = z_grid1(k) - z_grid1(k-1)
-    endif
+    do k = 1,nzm-1
+      if (k.eq.1) then
+         z_diff1(k) = z_grid1(1)
+      else
+         z_diff1(k) = z_grid1(k) - z_grid1(k-1)
+      endif
+    enddo
+    z_diff1(nzm) = z(nzm)-z_grid1(nzm)
     
     do k = 1,nz_offset !height_inv_offset(i,j)
       NA_accum_ref_col0=NA_accum_ref_col0 + tmpnacc_ref(k)*(z_diff1(k))/z(nz_offset)
