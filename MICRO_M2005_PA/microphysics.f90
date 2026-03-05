@@ -1758,7 +1758,7 @@ if(doShipDilution) then
          z_diff1(k) = z_grid1(k) - z_grid1(k-1)
       endif
     enddo
-    z_diff1(nzm) = z(nzm)-z_grid1(nzm)
+    z_diff1(nzm) = z(nzm)-z_grid1(nzm-1)
     
     do k = 1,nz_offset !height_inv_offset(i,j)
       NA_accum_ref_col0=NA_accum_ref_col0 + tmpnacc_ref(k)*(z_diff1(k))/z(nz_offset)
