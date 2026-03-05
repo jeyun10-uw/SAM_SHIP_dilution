@@ -1765,6 +1765,7 @@ if(doShipDilution) then
 
     if(masterproc) then
 	  print*, 'NA_accum_ref_col (#/mg)=', NA_accum_ref_col*1.e-6
+    endif
   endif
 endif
 
