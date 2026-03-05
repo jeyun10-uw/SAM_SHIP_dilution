@@ -1040,7 +1040,7 @@ real :: relhobs(nzm)
                 end if
 
                 local_max = 0. !1.e-6 !initialize subdomain maximum
-                local_min = 0. !1.e-6 !initialize subdomain maximum
+                local_min = 1.e16. !1.e-6 !initialize subdomain maximum
 
                 !search for maximum near-surface concentration in edge regions
                 do j = 1, ny
