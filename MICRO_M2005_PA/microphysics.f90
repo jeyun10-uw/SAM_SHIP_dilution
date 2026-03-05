@@ -1744,6 +1744,22 @@ if(doShipDilution) then
        nzm,day,z,pres,tmpnacc_ref,.true.)
   call InterpolateFromForcings(nsnd,nzsnd,daysnd,zsnd,psnd,AccumAerosolMass_snd_ref, &
        nzm,day,z,pres,tmpqacc_ref,.true.)
+  if(use_scam_track_width_spreading_rate) then
+     nn=1
+     do isfc=1,nsfc-1
+       if(day.gt.daysfc(isfc)) then
+         nn=isfc
+       endif
+     end do
+      
+     coef=(day-daysfc(nn))/(daysfc(nn+1)-daysfc(nn))
+     track_width0=track_width(nn)+(track_width(nn+1)-track_width(nn))*coef
+  else
+     track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
+  end if
+  if(masterproc) then
+    print*, 'Track Width [m]=',track_width0
+  endif
   if(doAutoDilutionStart) then
     NA_accum_ref_col0 = 0.
        !shifting verticl grid to grid box center
@@ -1766,7 +1782,6 @@ if(doShipDilution) then
     enddo
 
     NA_accum_ref_col = NA_accum_ref_col0
-
     !if(masterproc) then
 	!  print*, 'NA_accum_ref_col (#/mg)=', NA_accum_ref_col*1.e-6
     !endif
@@ -1776,19 +1791,6 @@ if(doShipDilution) then
       iftrackfull=.false.
     ENDIF
   else
-    if(use_scam_track_width_spreading_rate) then
-       nn=1
-       do isfc=1,nsfc-1
-         if(day.gt.daysfc(isfc)) then
-           nn=isfc
-         endif
-       end do
-        
-       coef=(day-daysfc(nn))/(daysfc(nn+1)-daysfc(nn))
-       track_width0=track_width(nn)+(track_width(nn+1)-track_width(nn))*coef
-    else
-       track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
-    end if
     IF (track_width0.GT.nx_gl*dx) THEN
       iftrackfull=.true.
     ELSE
