@@ -130,7 +130,7 @@ implicit none
  !moved aero_col, std_aero, aero_thresh, stats_flag to vars.f90
  real :: buffer30(5), buffer31(5), NC_env2, NAC_mean2, NAC2_mean, NAC_std2, &
          ncenv_numerator, ncenv_denominator, nacenv_denominator, nacenv_numerator, nacenv2_numerator, &
-         rhodz, tot_depth, local_max, edge_thresh, max_sum, total_edge_tasks
+         rhodz, tot_depth, local_max, local_min, edge_thresh, edge_min, max_sum, min_sum, total_edge_tasks
  real, dimension(nx) :: edge_factor
  real, dimension(nx,ny) :: aero_xy, aero_xy_col
 
@@ -1040,6 +1040,7 @@ real :: relhobs(nzm)
                 end if
 
                 local_max = 0. !1.e-6 !initialize subdomain maximum
+                local_min = 0. !1.e-6 !initialize subdomain maximum
 
                 !search for maximum near-surface concentration in edge regions
                 do j = 1, ny
@@ -1047,6 +1048,9 @@ real :: relhobs(nzm)
                       if (edge_factor(i) .gt. 0.5) then
                          if (aero_xy_col(i,j) .gt. local_max) then
                              local_max = aero_xy_col(i,j)
+			 endif
+                         if (aero_xy_col(i,j) .lt. local_min) then
+                             local_min = aero_xy_col(i,j)
                          end if     
                       endif
                    end do
@@ -1057,10 +1061,15 @@ real :: relhobs(nzm)
                   buffer30(1) = merge(local_max, 0.0, is_edge_task) !local_max
                   call task_sum_real(buffer30,buffer31,1)
                   max_sum  = buffer31(1)
+
+                  buffer30(1) = merge(local_min, 0.0, is_edge_task) !local_max
+                  call task_sum_real(buffer30,buffer31,1)
+                  min_sum  = buffer31(1)
                 end if
 
                 !compute edge threshold from averaged-max columns
                 edge_thresh = max_sum / (total_edge_tasks + 1.e-16) 
+                edge_min    = min_sum / (total_edge_tasks + 1.e-16) 
 
                 !point-by-point aerosol averages of edges of domain
                 ncenv_numerator = 0.
@@ -1106,10 +1115,10 @@ real :: relhobs(nzm)
                 NAC_std2 = sqrt(NAC2_mean - NAC_mean2**2)
 
 		if(doShipDilution.and.doAutoDilutionStart) then
-		  NAC_mean_edge = NAC_mean2
+		  NAC_mean_edge = edge_min
 		  if(masterproc) then
 		    IF(NAC_mean_edge.GT.NA_accum_ref_col+dNA_plume_threshold) THEN
-		      print*, 'NAC_mean_edge is greater than NA_accum_ref_col'
+		      print*, 'NAC_mean_edge is greater than NA_accum_ref_col', NAC_mean_edge*1.e-6, NA_accum_ref_col*1.e-6
 		    ENDIF
 		  endif
 		endif
