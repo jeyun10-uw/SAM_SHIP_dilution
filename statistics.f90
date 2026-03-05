@@ -1107,10 +1107,11 @@ real :: relhobs(nzm)
 
 		if(doShipDilution.and.doAutoDilutionStart) then
 		  NAC_mean_edge = NAC_mean2
-		  print*, 'NA_accum_ref_col (#/mg)=', NA_accum_ref_col*1.e-6
-		  IF(NAC_mean_edge.GT.NA_accum_ref_col+dNA_plume_threshold) THEN
-		    print*, 'NAC_mean_edge is greater than NA_accum_ref_col'
-		  ENDIF
+		  if(masterproc) then
+		    IF(NAC_mean_edge.GT.NA_accum_ref_col+dNA_plume_threshold) THEN
+		      print*, 'NAC_mean_edge is greater than NA_accum_ref_col'
+		    ENDIF
+		  endif
 		endif
                
                 NAc_thresh = NAC_mean2 + 3.0*NAC_std2

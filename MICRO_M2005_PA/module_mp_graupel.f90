@@ -2664,7 +2664,7 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
 
                   !IF (track_width0.GT.nx_gl*dx) THEN
                   NACC3DTEN(K) = MIN(0., -(NAD3D(K)+NC3D (K)-NACC_REF(K)) * spreading_rate0 / (track_width0) )
-                  QACC3DTEN(K) = MIN(0., -(QAD3D(K)+QAW3D(K)-NACC_REF(K)) * spreading_rate0 / (track_width0) )
+                  QACC3DTEN(K) = MIN(0., -(QAD3D(K)+QAW3D(K)-QACC_REF(K)) * spreading_rate0 / (track_width0) )
                   !ELSE
                   !   NACC3DTEN(K) = 0.
                   !   QACC3DTEN(K) = 0.

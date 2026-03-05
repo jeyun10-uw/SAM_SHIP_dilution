@@ -1654,6 +1654,7 @@ logical, parameter :: do_new_scavenge = .false.
 
 real :: scav_factor, scav_mass, scav_number
 real :: dry_aerosol_mass_before, dry_aerosol_number_before
+REAL NA_accum_ref_col0 = 0
 REAL track_width0
 real coef
 integer nn,isfc
@@ -1742,6 +1743,28 @@ if(doShipDilution) then
        nzm,day,z,pres,tmpnacc_ref,.true.)
   call InterpolateFromForcings(nsnd,nzsnd,daysnd,zsnd,psnd,AccumAerosolMass_snd_ref, &
        nzm,day,z,pres,tmpqacc_ref,.true.)
+  if(doAutoDilutionStart) then
+       !shifting verticl grid to grid box center
+    do k = 1,nzm-1
+       z_grid1(k) = (z(k+1) + z(k))/2.0
+    enddo
+    
+    !compute dz
+    if (k.eq.1) then
+       z_diff1(k) = z_grid1(1)
+    else
+       z_diff1(k) = z_grid1(k) - z_grid1(k-1)
+    endif
+    
+    do k = 1,nz_offset !height_inv_offset(i,j)
+      NA_accum_ref_col0=NA_accum_ref_col0 + tmpnacc_ref(k)*(z_diff1(k))/z(nz_offset)
+    enddo
+
+    NA_accum_ref_col = NA_accum_ref_col0
+
+    if(masterproc) then
+	  print*, 'NA_accum_ref_col (#/mg)=', NA_accum_ref_col*1.e-6
+  endif
 endif
 
 do j = 1,ny
@@ -2021,22 +2044,6 @@ do j = 1,ny
 
         if(doShipDilution) then
           if(doAutoDilutionStart) then
-            NA_accum_ref_col = 0
-               !shifting verticl grid to grid box center
-            do k = 1,nzm-1
-               z_grid1(k) = (z(k+1) + z(k))/2.0
-            enddo
-            
-            !compute dz
-            if (k.eq.1) then
-               z_diff1(k) = z_grid1(1)
-            else
-               z_diff1(k) = z_grid1(k) - z_grid1(k-1)
-            endif
-
-            do k = 1,nz_offset !height_inv_offset(i,j)
-              NA_accum_ref_col=NA_accum_ref_col + tmpnacc_ref(k)*(z_diff1(k))/z(nz_offset)
-            enddo
             IF(NAC_mean_edge.GT.NA_accum_ref_col+dNA_plume_threshold) THEN
               tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
               tmpnacc(:) = tmpnacc(:)+ dtn*mtendnacc
