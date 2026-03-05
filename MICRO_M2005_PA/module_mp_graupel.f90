@@ -1089,7 +1089,7 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
                                             PGAM, LAMC, MICRO_PROC_RATES, & !bloss: add radiative outputs
                                             DO_ACCUMULATE_MICRO_PROC_RATES, &
                                             n_tendency, stend, &
-                                            proc_extra, n_proc_extra, do_proc_extra &
+                                            proc_extra, n_proc_extra, do_proc_extra,iftrackfull &
                                             )
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -1221,6 +1221,8 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
         REAL DT         ! MODEL TIME STEP (SEC)
         REAL track_width0
         REAL spreading_rate0
+        logical, intent(in) :: iftrackfull
+
 
         integer, intent(in)  :: n_proc_extra
         logical, intent(in) :: do_proc_extra
@@ -2641,7 +2643,6 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
                END IF
 
 !....................................
-
                ! CHUN: Calculate Dilution effects
                IF (doShipDilution) THEN
                   if(use_scam_track_width_spreading_rate) then
@@ -2651,27 +2652,20 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
                          nn=i
                        endif
                      end do
-                      
                      coef=(day-daysfc(nn))/(daysfc(nn+1)-daysfc(nn))
                      track_width0=track_width(nn)+(track_width(nn+1)-track_width(nn))*coef
                      spreading_rate0=spreading_rate(nn)+(spreading_rate(nn+1)-spreading_rate(nn))*coef
-
-
                   else
                      track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
                      spreading_rate0 = 1.e3/3600*track_spreading_rate
                   end if
-
-                  NACC3DTEN(K) = 0.!MIN(0., -(NAD3D(K)+NC3D (K)-NACC_REF(K)) * spreading_rate0 / (track_width0) )
-                  QACC3DTEN(K) = 0.!MIN(0., -(QAD3D(K)+QAW3D(K)-QACC_REF(K)) * spreading_rate0 / (track_width0) )
-                  !IF (track_width0.GT.nx_gl*dx) THEN
-
-                  NACC3DTEN(K) = MIN(0., -(NAD3D(K)+NC3D (K)-NACC_REF(K)) * spreading_rate0 / (track_width0) )
-                  QACC3DTEN(K) = MIN(0., -(QAD3D(K)+QAW3D(K)-QACC_REF(K)) * spreading_rate0 / (track_width0) )
-                  !ELSE
-                  !   NACC3DTEN(K) = 0.
-                  !   QACC3DTEN(K) = 0.
-                  !ENDIF
+                  IF (iftrackfull) THEN
+                     NACC3DTEN(K) = MIN(0., -(NAD3D(K)+NC3D (K)-NACC_REF(K)) * spreading_rate0 / (track_width0) )
+                     QACC3DTEN(K) = MIN(0., -(QAD3D(K)+QAW3D(K)-QACC_REF(K)) * spreading_rate0 / (track_width0) )
+                  ELSE
+                     NACC3DTEN(K) = 0.
+                     QACC3DTEN(K) = 0.
+                  ENDIF
                ENDIF
 
                QV3DTEN(K) = QV3DTEN(K)+(-PRE(K)-EVPMS(K)-EVPMG(K))

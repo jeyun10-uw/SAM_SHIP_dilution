@@ -1658,6 +1658,7 @@ REAL NA_accum_ref_col0
 REAL track_width0
 real coef
 integer nn,isfc
+logical     :: iftrackfull = .false.
 
 
 real, external :: qsatw
@@ -1769,6 +1770,30 @@ if(doShipDilution) then
     !if(masterproc) then
 	!  print*, 'NA_accum_ref_col (#/mg)=', NA_accum_ref_col*1.e-6
     !endif
+    IF(NAC_mean_edge.GT.NA_accum_ref_col+dNA_plume_threshold) THEN
+      iftrackfull=.true.
+    ELSE
+      iftrackfull=.false.
+    ENDIF
+  else
+    if(use_scam_track_width_spreading_rate) then
+       nn=1
+       do isfc=1,nsfc-1
+         if(day.gt.daysfc(isfc)) then
+           nn=isfc
+         endif
+       end do
+        
+       coef=(day-daysfc(nn))/(daysfc(nn+1)-daysfc(nn))
+       track_width0=track_width(nn)+(track_width(nn+1)-track_width(nn))*coef
+    else
+       track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
+    end if
+    IF (track_width0.GT.nx_gl*dx) THEN
+      iftrackfull=.true.
+    ELSE
+      iftrackfull=.false.
+    ENDIF
   endif
 endif
 
@@ -1929,7 +1954,7 @@ do j = 1,ny
            tmp_cl_pgam, tmp_cl_lambda, &
            micro_proc_rates,do_accumulate_process_rates, &
            nmicro_fields, stend1d, & !bloss(2020-11): Make sedimentation tendencies available for all species
-           proc_extra, n_mkbudget_extra, do_mkbudget_extra)
+           proc_extra, n_mkbudget_extra, do_mkbudget_extra, iftrackfull)
  
      ! update microphysical quantities in this grid column
       if(doprecip) then
@@ -2050,31 +2075,8 @@ do j = 1,ny
         tmpnacc(:) = tmpnad(:)+tmpncl(:)
 
         if(doShipDilution) then
-          if(doAutoDilutionStart) then
-            IF(NAC_mean_edge.GT.NA_accum_ref_col+dNA_plume_threshold) THEN
-              tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
-              tmpnacc(:) = tmpnacc(:)+ dtn*mtendnacc
-            ENDIF
-
-          else
-            if(use_scam_track_width_spreading_rate) then
-               nn=1
-               do isfc=1,nsfc-1
-                 if(day.gt.daysfc(isfc)) then
-                   nn=isfc
-                 endif
-               end do
-                
-               coef=(day-daysfc(nn))/(daysfc(nn+1)-daysfc(nn))
-               track_width0=track_width(nn)+(track_width(nn+1)-track_width(nn))*coef
-            else
-               track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
-            end if
-            IF (track_width0.GT.nx_gl*dx) THEN
-              tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
-              tmpnacc(:) = tmpnacc(:)+ dtn*mtendnacc
-            ENDIF
-          endif
+          tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
+          tmpnacc(:) = tmpnacc(:)+ dtn*mtendnacc
         end if
 
         !bloss(2020-11): Partition total (dry+wet) aerosol mass into
