@@ -179,6 +179,12 @@ implicit none
  real :: NAc_env, std_nac_env
  real, dimension(nx) :: tmpx_pos
 
+ !chun: variables relevant to ship dilution
+
+ integer :: nn, isfc
+ real :: coef_sfc
+ real :: track_width0 = 0
+
  !fraction of grid on edges of the domain used to calculate environmental NC
  !real, parameter :: edge_frac = 0.125 
 
@@ -1040,7 +1046,7 @@ real :: relhobs(nzm)
                 end if
 
                 local_max = 0. !1.e-6 !initialize subdomain maximum
-                local_min = 1.e16. !1.e-6 !initialize subdomain maximum
+                local_min = 1.e16 !1.e-6 !initialize subdomain maximum
 
                 !search for maximum near-surface concentration in edge regions
                 do j = 1, ny
@@ -1116,9 +1122,23 @@ real :: relhobs(nzm)
 
 		if(doShipDilution.and.doAutoDilutionStart) then
 		  NAC_mean_edge = edge_min
+		  if(use_scam_track_width_spreading_rate) then
+		     nn=1
+		     do isfc=1,nsfc-1
+		       if(day.gt.daysfc(isfc)) then
+		         nn=isfc
+		       endif
+		     end do
+		      
+		     coef_sfc=(day-daysfc(nn))/(daysfc(nn+1)-daysfc(nn))
+		     track_width0=track_width(nn)+(track_width(nn+1)-track_width(nn))*coef_sfc
+		  else
+		     track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
+		  end if
 		  if(masterproc) then
+		    print*, 'Track Width [m]=',track_width0
 		    print*, 'Edge Min:',NAC_mean_edge*1.e-6
-		    print*, 'Reference: ',NAC_mean_edge*1.e-6
+		    print*, 'Reference: ',NA_accum_ref_col*1.e-6
 		    IF(NAC_mean_edge.GT.NA_accum_ref_col+dNA_plume_threshold) THEN
 		      print*, 'NAC_mean_edge is greater than NA_accum_ref_col'!, NAC_mean_edge*1.e-6, NA_accum_ref_col*1.e-6
 		    ENDIF

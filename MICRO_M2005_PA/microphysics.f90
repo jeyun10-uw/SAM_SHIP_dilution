@@ -1757,9 +1757,9 @@ if(doShipDilution) then
   else
      track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
   end if
-  if(masterproc) then
-    print*, 'Track Width [m]=',track_width0
-  endif
+  !if(masterproc) then
+  !  print*, 'Track Width [m]=',track_width0
+  !endif
   if(doAutoDilutionStart) then
     NA_accum_ref_col0 = 0.
        !shifting verticl grid to grid box center
@@ -1780,12 +1780,11 @@ if(doShipDilution) then
     do k = 1,nz_offset !height_inv_offset(i,j)
       NA_accum_ref_col0=NA_accum_ref_col0 + tmpnacc_ref(k)*(z_diff1(k))/z(nz_offset)
     enddo
-
     NA_accum_ref_col = NA_accum_ref_col0
     !if(masterproc) then
 	!  print*, 'NA_accum_ref_col (#/mg)=', NA_accum_ref_col*1.e-6
     !endif
-    IF(NAC_mean_edge.GT.NA_accum_ref_col+dNA_plume_threshold) THEN
+    IF(NAC_mean_edge .GT. NA_accum_ref_col + dNA_plume_threshold .OR. day .GT. shipv2_time0+1.) THEN
       iftrackfull=.true.
     ELSE
       iftrackfull=.false.
