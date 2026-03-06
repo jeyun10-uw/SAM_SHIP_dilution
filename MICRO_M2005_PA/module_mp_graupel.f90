@@ -1224,6 +1224,7 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
         REAL track_width0
         REAL spreading_rate0
         logical, intent(in) :: iftrackfull
+        logical, save :: printed_once = .false.
 
 
         integer, intent(in)  :: n_proc_extra
@@ -2665,13 +2666,10 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
                      NACC3DTEN(K) = MIN(0., -(NACC3D(K)-NACC_REF(K)) * spreading_rate0 / (track_width0) )
                      QACC3DTEN(K) = MIN(0., -(QACC3D(K)-QACC_REF(K)) * spreading_rate0 / (track_width0) )
 
-                  logical, save :: printed_once = .false.
                   if (.not. printed_once) then
-                    do k=1,50
-                      write(*,'(A,I3,5E14.5)') 'dilution:', k, NACC3D(k), NACC_REF(k), &
-                           NACC3D(k)-NACC_REF(k), track_width0, NACC3DTEN(k)
-                    enddo
-                    printed_once = .true.
+                      write(*,'(A,I3,5E14.5)') 'dilution:', K, NACC3D(K), NACC_REF(K), &
+                           NACC3D(K)-NACC_REF(K), track_width0, NACC3DTEN(K)
+                  printed_once = .true.
                   endif
                   ELSE
                      NACC3DTEN(K) = 0.
