@@ -2647,35 +2647,35 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
 
 !....................................
                ! CHUN: Calculate Dilution effects
-               IF (doShipDilution) THEN
-                  if(use_scam_track_width_spreading_rate) then
-                     nn=1
-                     do i=1,nsfc-1
-                       if(day.gt.daysfc(i)) then
-                         nn=i
-                       endif
-                     end do
-                     coef=(day-daysfc(nn))/(daysfc(nn+1)-daysfc(nn))
-                     track_width0=track_width(nn)+(track_width(nn+1)-track_width(nn))*coef
-                     spreading_rate0=spreading_rate(nn)+(spreading_rate(nn+1)-spreading_rate(nn))*coef
-                  else
-                     track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
-                     spreading_rate0 = 1.e3/3600*track_spreading_rate
-                  end if
-                  IF (iftrackfull) THEN
-                     NACC3DTEN(K) = MIN(0., -(NACC3D(K)-NACC_REF(K)) * spreading_rate0 / (track_width0) )
-                     QACC3DTEN(K) = MIN(0., -(QACC3D(K)-QACC_REF(K)) * spreading_rate0 / (track_width0) )
+               !IF (doShipDilution) THEN
+               !   if(use_scam_track_width_spreading_rate) then
+               !      nn=1
+               !      do i=1,nsfc-1
+               !        if(day.gt.daysfc(i)) then
+               !          nn=i
+               !        endif
+               !      end do
+               !      coef=(day-daysfc(nn))/(daysfc(nn+1)-daysfc(nn))
+               !      track_width0=track_width(nn)+(track_width(nn+1)-track_width(nn))*coef
+               !      spreading_rate0=spreading_rate(nn)+(spreading_rate(nn+1)-spreading_rate(nn))*coef
+               !   else
+               !      track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
+               !      spreading_rate0 = 1.e3/3600*track_spreading_rate
+               !   end if
+               !   IF (iftrackfull) THEN
+               !      NACC3DTEN(K) = MIN(0., -(NACC3D(K)-NACC_REF(K)) * spreading_rate0 / (track_width0) )
+               !      QACC3DTEN(K) = MIN(0., -(QACC3D(K)-QACC_REF(K)) * spreading_rate0 / (track_width0) )
 
                   !if (.not. printed_once) then
                   !    write(*,'(A,I3,5E14.5)') 'dilution:', K, NACC3D(K), NACC_REF(K), &
                   !         NACC3D(K)-NACC_REF(K), track_width0, NACC3DTEN(K)
                   !printed_once = .true.
-                  endif
-                  ELSE
-                     NACC3DTEN(K) = 0.
-                     QACC3DTEN(K) = 0.
-                  ENDIF
-               ENDIF
+                  !endif
+               !   ELSE
+               !      NACC3DTEN(K) = 0.
+               !      QACC3DTEN(K) = 0.
+               !   ENDIF
+               !ENDIF
 
                QV3DTEN(K) = QV3DTEN(K)+(-PRE(K)-EVPMS(K)-EVPMG(K))
 

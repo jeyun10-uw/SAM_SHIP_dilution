@@ -43,7 +43,7 @@ use vars, only: pres, rho, dtn, w, t, tabs, qv, qcl, qpl, qci, qpi, &
      nstep, nstatis, nprint, icycle, total_water_prec, &
      AccumAerosolMass_snd, AccumAerosolNumber_snd, &
      AccumAerosolMass_snd_ref, AccumAerosolNumber_snd_ref, NA_accum_ref_col, NAC_mean_edge,&
-     track_width,&
+     track_width,spreading_rate,&
      nsnd,nzsnd,daysnd,zsnd,psnd,nsfc,daysfc
      
 use domain, only: YES3D     
@@ -1655,7 +1655,7 @@ logical, parameter :: do_new_scavenge = .false.
 real :: scav_factor, scav_mass, scav_number
 real :: dry_aerosol_mass_before, dry_aerosol_number_before
 REAL NA_accum_ref_col0
-REAL track_width0
+REAL track_width0,spreading_rate0
 real coef
 integer nn,isfc
 logical     :: iftrackfull = .false.
@@ -1755,8 +1755,10 @@ if(doShipDilution) then
       
      coef=(day-daysfc(nn))/(daysfc(nn+1)-daysfc(nn))
      track_width0=track_width(nn)+(track_width(nn+1)-track_width(nn))*coef
+     spreading_rate0=spreading_rate(nn)+(spreading_rate(nn+1)-spreading_rate(nn))*coef
   else
      track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
+     spreading_rate0 = 1.e3/3600*track_spreading_rate
   end if
   !if(masterproc) then
   !  print*, 'Track Width [m]=',track_width0
@@ -1867,6 +1869,32 @@ do j = 1,ny
 
          if(.NOT.doprecoff) tmpqar(:) = micro_field(i,j,:,iqar)/massfactor
          
+         if(doShipDilution) then
+
+           IF (iftrackfull) THEN
+             do k=1,nzm
+               mtendnacc(k) = MIN(0., -(tmpnacc(k)-tmpnacc_ref(k)) * spreading_rate0 / (track_width0) )
+               mtendqacc(k) = MIN(0., -(tmpqacc(k)-tmpqacc_ref(k)) * spreading_rate0 / (track_width0) )
+             enddo
+           ELSE
+             mtendnacc(:)= 0.
+             mtendqacc(:)= 0.
+           ENDIF
+
+           tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
+           tmpnacc(:) = tmpnacc(:)+ dtn*mtendnacc
+           if (.not. printed_once) then
+             do k=1,70
+               write(*,'(A,I3,5E14.5)') 'dilution:', k, tmpnacc(k), tmpnacc_ref(k), &
+                    tmpnacc(k)-tmpnacc_ref(k), mtendnacc(k)
+             enddo
+           printed_once = .true.
+           endif
+         
+           micro_field(i,j,:,inaccr) = tmpnacc_ref(:)
+           micro_field(i,j,:,iqaccr) = tmpqacc_ref(:)
+         end if
+
          !bloss(2020-11): Partition total (dry+wet) aerosol mass into
          !   dry aerosol mass and wet (in-cloud-droplet) aerosol mass
          call PartitionAerosolMass( nzm, tmpnacc, tmpqacc, aer_sig1, &
@@ -1938,6 +1966,7 @@ do j = 1,ny
       !   stend1d: array of 1d profiles of sedimentation tendencies for q*
       !   tmp**: on input, current value of **.  On output, new value of **.
       !   eff*1d: one-dim. profile of effective raduis for *
+
 
       ! chun: mtendqacc, mtendnacc, tmpnacc_ref, tmpqacc_ref are added to calculate ship dilution
       call m2005micro_graupel(&
@@ -2075,21 +2104,6 @@ do j = 1,ny
         !bloss(2020-11): prognostic variablses for wet+dry aerosol
         tmpqacc(:) = tmpqad(:)+tmpqaw(:)
         tmpnacc(:) = tmpnad(:)+tmpncl(:)
-
-        if(doShipDilution) then
-          tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
-          tmpnacc(:) = tmpnacc(:)+ dtn*mtendnacc
-          if (.not. printed_once) then
-            do k=1,70
-              write(*,'(A,I3,5E14.5)') 'dilution:', k, tmpnacc(k), tmpnacc_ref(k), &
-                   tmpnacc(k)-tmpnacc_ref(k), mtendnacc(k)
-            enddo
-          printed_once = .true.
-          endif
-
-          micro_field(i,j,:,inaccr) = tmpnacc_ref(:)
-          micro_field(i,j,:,iqaccr) = tmpqacc_ref(:)
-        end if
 
         !bloss(2020-11): Partition total (dry+wet) aerosol mass into
          !   dry aerosol mass and wet (in-cloud-droplet) aerosol mass
