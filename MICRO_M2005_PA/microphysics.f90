@@ -2078,6 +2078,9 @@ do j = 1,ny
         if(doShipDilution) then
           tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
           tmpnacc(:) = tmpnacc(:)+ dtn*mtendnacc
+
+          micro_field(i,j,:,inaccr) = tmpnacc_ref(:)
+          micro_field(i,j,:,iqaccr) = tmpqacc_ref(:)
         end if
 
         !bloss(2020-11): Partition total (dry+wet) aerosol mass into

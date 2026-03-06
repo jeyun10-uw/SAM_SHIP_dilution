@@ -2662,8 +2662,8 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
                      spreading_rate0 = 1.e3/3600*track_spreading_rate
                   end if
                   IF (iftrackfull) THEN
-                     NACC3DTEN(K) = MIN(0., -(NACC(K)-NACC_REF(K)) * spreading_rate0 / (track_width0) )
-                     QACC3DTEN(K) = MIN(0., -(QACC(K)-QACC_REF(K)) * spreading_rate0 / (track_width0) )
+                     NACC3DTEN(K) = MIN(0., -(NACC3D(K)-NACC_REF(K)) * spreading_rate0 / (track_width0) )
+                     QACC3DTEN(K) = MIN(0., -(QACC3D(K)-QACC_REF(K)) * spreading_rate0 / (track_width0) )
                   ELSE
                      NACC3DTEN(K) = 0.
                      QACC3DTEN(K) = 0.
