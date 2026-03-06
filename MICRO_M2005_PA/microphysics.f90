@@ -1829,6 +1829,9 @@ do j = 1,ny
       tmpqg(:) = 0.
       tmpng(:) = 0.
 
+      mtendnacc = 0.
+      mtendqacc = 0.
+
       tmp_cl_pgam(:) = 0.
       tmp_cl_lambda(:) = 0.
 
@@ -1947,8 +1950,6 @@ do j = 1,ny
       mtendnci = 0.
       mtendns = 0.
       mtendng = 0.
-      mtendnacc = 0.
-      mtendqacc = 0.
 
       tmtend1d = 0.
 
