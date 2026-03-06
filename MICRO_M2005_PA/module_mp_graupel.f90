@@ -2666,10 +2666,10 @@ SUBROUTINE M2005MICRO_GRAUPEL(QC3DTEN,QI3DTEN,QNI3DTEN,QR3DTEN,QAD3DTEN,QAW3DTEN
                      NACC3DTEN(K) = MIN(0., -(NACC3D(K)-NACC_REF(K)) * spreading_rate0 / (track_width0) )
                      QACC3DTEN(K) = MIN(0., -(QACC3D(K)-QACC_REF(K)) * spreading_rate0 / (track_width0) )
 
-                  if (.not. printed_once) then
-                      write(*,'(A,I3,5E14.5)') 'dilution:', K, NACC3D(K), NACC_REF(K), &
-                           NACC3D(K)-NACC_REF(K), track_width0, NACC3DTEN(K)
-                  printed_once = .true.
+                  !if (.not. printed_once) then
+                  !    write(*,'(A,I3,5E14.5)') 'dilution:', K, NACC3D(K), NACC_REF(K), &
+                  !         NACC3D(K)-NACC_REF(K), track_width0, NACC3DTEN(K)
+                  !printed_once = .true.
                   endif
                   ELSE
                      NACC3DTEN(K) = 0.

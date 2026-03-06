@@ -1659,6 +1659,7 @@ REAL track_width0
 real coef
 integer nn,isfc
 logical     :: iftrackfull = .false.
+logical, save :: printed_once = .false.
 
 
 real, external :: qsatw
@@ -2078,6 +2079,13 @@ do j = 1,ny
         if(doShipDilution) then
           tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
           tmpnacc(:) = tmpnacc(:)+ dtn*mtendnacc
+          if (.not. printed_once) then
+            do k=1,70
+              write(*,'(A,I3,5E14.5)') 'dilution:', k, tmpnacc(k), tmpnacc_ref(k), &
+                   tmpnacc(k)-tmpnacc_ref(k), mtendnacc(k)
+            enddo
+          printed_once = .true.
+          endif
 
           micro_field(i,j,:,inaccr) = tmpnacc_ref(:)
           micro_field(i,j,:,iqaccr) = tmpqacc_ref(:)
