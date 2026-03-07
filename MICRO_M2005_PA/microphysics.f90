@@ -1884,14 +1884,14 @@ do j = 1,ny
              mtendqacc(:)= 0.
            ENDIF
 
-           tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
            tmpnacc(:) = tmpnacc(:)+ dtn*mtendnacc
-           if (.not. printed_once) then
-             do k=1,70
-               write(*,'(A,I3,5E14.5)') 'dilution:', k, tmpnacc(k), tmpnacc_ref(k), &
-                    tmpnacc(k)-tmpnacc_ref(k), mtendnacc(k)
-             enddo
-           printed_once = .true.
+           tmpqacc(:) = tmpqacc(:)+ dtn*mtendqacc
+           !if (.not. printed_once) then
+           !  do k=1,70
+           !    write(*,'(A,I3,5E14.5)') 'dilution:', k, tmpnacc(k), tmpnacc_ref(k), &
+           !         tmpnacc(k)-tmpnacc_ref(k), mtendnacc(k)
+           !  enddo
+           !printed_once = .true.
            endif
          
            micro_field(i,j,:,inaccr) = tmpnacc_ref(:)
