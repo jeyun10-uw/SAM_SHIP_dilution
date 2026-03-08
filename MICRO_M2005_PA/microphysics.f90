@@ -469,9 +469,14 @@ subroutine micro_setparm()
     iqad = count + 4 ! dry aerosol mass mixing ratio [kg aerosol/kg dry air]
     iqaw = count + 5 ! wet aerosol mass mixing ratio [kg activated aerosol/kg dry air]
 
-    inaccr = count + 6 ! chun: ref for dilution cal of dry + wet aerosol mass mixing ratio [kg aerosol/kg dry air]
-    iqaccr = count + 7 ! chun: ref for dilution cal of dry aerosol mass mixing ratio [kg aerosol/kg dry air]
-    count = count + 7
+    if(doShipDilution) then
+      inaccr = count + 6 ! chun: ref for dilution cal of dry + wet aerosol mass mixing ratio [kg aerosol/kg dry air]
+      iqaccr = count + 7 ! chun: ref for dilution cal of dry aerosol mass mixing ratio [kg aerosol/kg dry air]
+      count = count + 7
+    else
+      count = count + 5 
+    endif
+
   end if
 
   if(count.ne.nmicro_fields) then
@@ -1892,7 +1897,7 @@ do j = 1,ny
            !         tmpnacc(k)-tmpnacc_ref(k), mtendnacc(k)
            !  enddo
            !printed_once = .true.
-           endif
+           !endif
          
            micro_field(i,j,:,inaccr) = tmpnacc_ref(:)
            micro_field(i,j,:,iqaccr) = tmpqacc_ref(:)
