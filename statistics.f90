@@ -217,6 +217,8 @@ real, dimension(nzm) :: rhowcl, rhowmsecl, rhowtlcl, rhowqtcl,  &
      rhowtvcl, rhowtvcla
 
 real :: relhobs(nzm)
+real :: rh0(nzm)
+
 
 ! END UW ADDITIONS
 !========================================================================
