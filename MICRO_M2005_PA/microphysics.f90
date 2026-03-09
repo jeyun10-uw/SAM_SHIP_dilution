@@ -14,7 +14,8 @@ module microphysics
 
 use params, only: rgas, rv, cp, lcond, lsub, fac_cond, fac_sub, ggr, &
      ug, vg, & ! domain advection velocities for ship plume.
-  pi, doprecip, docloud, doShipDilution, nz_offset, doAutoDilutionStart,dNA_plume_threshold,use_scam_track_width_spreading_rate, track_spreading_rate
+  pi, doprecip, docloud, doShipDilution, nz_offset, doAutoDilutionStart, &
+  dNA_plume_threshold,use_tke_track_width_spreading_rate,use_scam_track_width_spreading_rate, track_spreading_rate
 
 use src_scavenging, only: memory, init_scavenging, m2011_scavenging, scav_cloud_2m, qxeps
 use aerosol_utils, only: DryAerosolMassFraction, PartitionAerosolMass
