@@ -41,6 +41,7 @@ implicit none
 	real qi2z(nzm)
 	real qs2z(nzm)
 	real tkez(nzm)
+	real tke2(nzm) ! chun: horizontal TKE to calculate spreading rate
 	real fadv(nz)
 	real shear(nz)
 	real shearx(nzm)
@@ -125,6 +126,8 @@ implicit none
   ! real :: fixed_delta = 2.e6 !additional delta over avg. max column aerosol (2 #/mg)
 
  logical is_edge_task
+ integer kinv
+ real tmp_max, tmp_check, tke2_bl
 
  real :: std_t = 3.0 !standard deviation 
  !moved aero_col, std_aero, aero_thresh, stats_flag to vars.f90
@@ -133,6 +136,7 @@ implicit none
          rhodz, tot_depth, local_max, local_min, edge_thresh, edge_min, max_sum, min_sum, total_edge_tasks
  real, dimension(nx) :: edge_factor
  real, dimension(nx,ny) :: aero_xy, aero_xy_col
+ real, dimension(nx,ny) :: tke_xy, tke_xy_col
 
  !column-by-column MLM stuff
  real, dimension(nx,ny,nzm) :: T_shift !correcting tabs grid 
@@ -184,6 +188,7 @@ implicit none
  integer :: nn, isfc
  real :: coef_sfc
  real :: track_width0 = 0
+ real :: spreading_rate0 = 0
 
  !fraction of grid on edges of the domain used to calculate environmental NC
  !real, parameter :: edge_frac = 0.125 
@@ -515,6 +520,7 @@ real :: relhobs(nzm)
 	 end do
 	 skw(k) = w3z(k)/(w2z(k)*factor_xy+1.e-5)**1.5
 	 tkez(k)= 0.5*(u2z(k)+v2z(k)*YES3D+w2z(k))
+	 tke2(k)= 0.5*(u2z(k)+v2z(k)*YES3D)
 	 tvwle(k) = tvwle(k) * bet(k) /(rho(k)*cp)
 	 do j=1,ny
 	  do i=1,nx
@@ -999,9 +1005,6 @@ real :: relhobs(nzm)
                          do k = 1,nz_offset !height_inv_offset(i,j)
                             aero_xy(i,j) = Accumaero(i,j,k)
                             aero_xy_col(i,j) = aero_xy_col(i,j) + aero_xy(i,j)*(z_diff1(k)/z(nz_offset))
-                         !do k = 1,height_inv_offset(i,j)
-                         !   aero_xy(i,j) = Accumaero(i,j,k)
-                         !   aero_xy_col(i,j) = aero_xy_col(i,j) + aero_xy(i,j)*(z_diff1(k)/z(height_inv_offset(i,j)))
                          enddo
                       endif
                    enddo
@@ -1132,11 +1135,37 @@ real :: relhobs(nzm)
 		      
 		     coef_sfc=(day-daysfc(nn))/(daysfc(nn+1)-daysfc(nn))
 		     track_width0=track_width(nn)+(track_width(nn+1)-track_width(nn))*coef_sfc
+		     spreading_rate0=spreading_rate(nn)+(spreading_rate(nn+1)-spreading_rate(nn))*coef_sfc
+		  elseif(use_tke_track_width_spreading_rate) then
+		     kinv = 0
+		     tke2_bl = 0.
+                     tmp_max = -1.
+                     
+		     do k = 1,nzm
+                     rh0(k) = qv0(k)/qsatw(tabs0(k),pres(k))
+                     end do
+                     do k = 1,nzm-1
+                       tmp_check = - (rh0(k+1)-rh0(k)) * (t0(k+1)-t0(k)) &
+                            / (z(k+1)-z(k))**2
+                       if(tmp_check.gt.tmp_max) then
+                         kinv = k
+                         tmp_max = tmp_check !mwyant: need to update tmp_max!
+                       end if
+                     end do
+                     do k = 1,kinv
+                        tke2_bl = tke2_bl+ tke2(k)*factor_xy*(z_diff1(k)/z(kinv))
+                     enddo
+		     spreading_rate_tke = 1.e3/3600.*(2.0941 * tke2_bl + 0.5078)
+		     !track_width_tke = track_width_tke + dt_stat * spreading_rate0
+		     spreading_rate0 = spreading_rate_tke
+		     track_width0 = track_width_tke
+		     print*,'BL avg. hori. TKE [m2/s2]=',tke2_bl
 		  else
 		     track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
 		  end if
 		  if(masterproc) then
 		    print*, 'Track Width [m]=',track_width0
+		    print*, 'Spreading rate [km/hr]=',3600./1.e3*spreading_rate0
 		    print*, 'Edge Min:',NAC_mean_edge*1.e-6
 		    print*, 'Reference: ',NA_accum_ref_col*1.e-6
 		    IF(NAC_mean_edge.GT.NA_accum_ref_col+dNA_plume_threshold) THEN

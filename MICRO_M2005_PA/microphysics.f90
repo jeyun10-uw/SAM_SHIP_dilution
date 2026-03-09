@@ -43,7 +43,7 @@ use vars, only: pres, rho, dtn, w, t, tabs, qv, qcl, qpl, qci, qpi, &
      nstep, nstatis, nprint, icycle, total_water_prec, &
      AccumAerosolMass_snd, AccumAerosolNumber_snd, &
      AccumAerosolMass_snd_ref, AccumAerosolNumber_snd_ref, NA_accum_ref_col, NAC_mean_edge,&
-     track_width,spreading_rate,&
+     track_width,spreading_rate,track_width_tke,spreading_rate_tke,&
      nsnd,nzsnd,daysnd,zsnd,psnd,nsfc,daysfc
      
 use domain, only: YES3D     
@@ -1663,7 +1663,7 @@ REAL NA_accum_ref_col0
 REAL track_width0,spreading_rate0
 real coef
 integer nn,isfc
-logical     :: iftrackfull = .false.
+logical, save :: iftrackfull = .false.
 logical, save :: printed_once = .false.
 
 
@@ -1792,16 +1792,17 @@ if(doShipDilution) then
     !if(masterproc) then
 	!  print*, 'NA_accum_ref_col (#/mg)=', NA_accum_ref_col*1.e-6
     !endif
-    IF(NAC_mean_edge .GT. NA_accum_ref_col + dNA_plume_threshold .OR. day .GT. shipv2_time0+1.) THEN
+    IF(NAC_mean_edge .GT. NA_accum_ref_col + dNA_plume_threshold) THEN
       iftrackfull=.true.
-    ELSE
-      iftrackfull=.false.
+      if(use_tke_track_width_spreading_rate) then
+        track_width_tke = track_width_tke + dtn*spreading_rate_tke
+        track_width0   = track_width_tke
+        spreading_rate0= spreading_rate_tke
+      endif
     ENDIF
   else
     IF (track_width0.GT.nx_gl*dx) THEN
       iftrackfull=.true.
-    ELSE
-      iftrackfull=.false.
     ENDIF
   endif
 endif
