@@ -1161,7 +1161,9 @@ real :: rh0(nzm)
 		     !track_width_tke = track_width_tke + dt_stat * spreading_rate0
 		     spreading_rate0 = spreading_rate_tke
 		     track_width0 = track_width_tke
-		     print*,'BL avg. hori. TKE [m2/s2]=',tke2_bl
+		     if(masterproc) then
+		       print*,'BL avg. hori. TKE [m2/s2]=',tke2_bl
+		     endif
 		  else
 		     track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
 		  end if
