@@ -1799,6 +1799,8 @@ if(doShipDilution) then
         track_width0   = track_width_tke
         spreading_rate0= spreading_rate_tke
       endif
+    ELSE
+        track_width_tke =nx_gl*dx
     ENDIF
   else
     IF (track_width0.GT.nx_gl*dx) THEN

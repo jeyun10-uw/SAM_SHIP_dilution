@@ -281,8 +281,8 @@ real tkediss(nx, ny, nzm) !dissipation of tke (resolved)
 ! chun: variables for ship dilution
 real :: NA_accum_ref_col = 0.
 real :: NAC_mean_edge = 0.
-real :: track_width_tke = nx_gl * dx
 real :: spreading_rate_tke = 0.
+real :: track_width_tke
 ! END UW ADDITIONS
 !===========================================================================
 
