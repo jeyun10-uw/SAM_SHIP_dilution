@@ -50,7 +50,7 @@ real ustar (nx, ny), fluxbq_coef (nx, ny), qsat_surf (nx, ny), u10arr(nx, ny)
 !-----------------------------------------------------------------
 ! profiles 
 
-real   t0(nzm), q0(nzm), qv0(nzm), tabs0(nzm), tl0(nzm), &
+real   t0(nzm), q0(nzm), qv0(nzm), tabs0(nzm), &!tl0(nzm), &
        tv0(nzm), u0(nzm), v0(nzm), &
        tg0(nzm), qg0(nzm), ug0(nzm), vg0(nzm), p0(nzm), &
        t01(nzm), q01(nzm), qp0(nzm), qn0(nzm), &

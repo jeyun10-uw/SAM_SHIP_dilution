@@ -386,7 +386,7 @@ if(dolargescale.and.time.gt.timelargescale) then
        w_wtg = w_wtg * MAX(0., MIN(1., (wtg_end_time - day ) / wtg_end_ramp ) ) * MAX(0., MIN(1., (day - wtg_start_time) / wtg_start_ramp ) )
        
        ! The intensity of wtg is multiplied by fractional area of ship track relative to the domain width 
-       w_wtg = w_wtg * track_width0 / (dx*float(nx_gl))
+       w_wtg = w_wtg * MAX(0.,MIN(1.,track_width0 / (dx*float(nx_gl))))
        if(mod(nstep,nstat).eq.0) then
           if(masterproc) write(*,*) 'day, track width/domain width = ',day, track_width0, track_width0/(dx*float(nx_gl)) 
        endif
