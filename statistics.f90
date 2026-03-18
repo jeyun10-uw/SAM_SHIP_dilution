@@ -42,6 +42,9 @@ implicit none
 	real qs2z(nzm)
 	real tkez(nzm)
 	real tke2(nzm) ! chun: horizontal TKE to calculate spreading rate
+	real tl0(nzm) ! chun: horizontal TKE to calculate spreading rate
+	real diss0(nzm) ! chun: horizontal TKE to calculate spreading rate
+	real trackstat0(nzm) ! chun: horizontal TKE to calculate spreading rate
 	real fadv(nz)
 	real shear(nz)
 	real shearx(nzm)
@@ -127,7 +130,7 @@ implicit none
 
  logical is_edge_task
  integer kinv
- real tmp_max, tmp_check, tke2_bl
+ real tmp_max, tmp_check, tke2_bl, tl0_bl
 
  real :: std_t = 3.0 !standard deviation 
  !moved aero_col, std_aero, aero_thresh, stats_flag to vars.f90
@@ -507,6 +510,9 @@ real :: rh0(nzm)
 	 qc2z(k) = 0.
 	 qi2z(k) = 0.
 	 qs2z(k) = 0.
+	 tl0(k) = 0.
+	 diss0(k) = 0.
+	 trackstat0(k) = 0.
 	 do j=1,ny
 	  do i=1,nx
 	    u2z(k) = u2z(k)+(u(i,j,k)-u0(k))**2	  
@@ -1144,8 +1150,35 @@ real :: rh0(nzm)
                      tmp_max = -1.
                      
 		     do k = 1,nzm
-                     rh0(k) = qv0(k)/qsatw(tabs0(k),pres(k))
+                       rh0(k) = qv0(k)/qsatw(tabs0(k),pres(k))
+		       diss0(k) = -(tkelediss(k)+tkelediff(k))
                      end do
+
+		     if(dompi) then
+                        coef1 = 1./float(nsubdomains)
+                        do k=1,nzm
+                          buffer(k,1) = t0(k)
+                          buffer(k,2) = rh0(k)
+                          buffer(k,3) = tke2(k)
+                          buffer(k,4) = u2z(k)
+                          buffer(k,5) = v2z(k)
+                          buffer(k,6) = diss0(k)
+                        end do
+                        call task_sum_real8(buffer,buffer1,nzm*6)
+                        do k=1,nzm
+                          t0(k)       =buffer1(k,1)*coef1
+                          rh0(k)      =buffer1(k,2)*coef1
+                          tke2(k)     =buffer1(k,3)*coef1
+                          u2z(k)      =buffer1(k,4)*coef1
+                          v2z(k)      =buffer1(k,5)*coef1
+                          diss0(k)    =buffer1(k,6)*coef1
+                        end do
+		     endif
+
+                     do k=1,nzm
+                       tl0(k) = (0.5*u2z(k)/(diss0(k))+0.5*v2z(k)/(diss0(k)))/2.0
+                     end do
+
                      do k = 1,nzm-1
                        tmp_check = - (rh0(k+1)-rh0(k)) * (t0(k+1)-t0(k)) &
                             / (z(k+1)-z(k))**2
@@ -1155,18 +1188,30 @@ real :: rh0(nzm)
                        end if
                      end do
                      do k = 1,kinv
-                        tke2_bl = tke2_bl+ tke2(k)*factor_xy*(z_diff1(k)/z(kinv))
+                        tke2_bl = tke2_bl+ tke2(k)*(z_diff1(k)/z(kinv))
+                        tl0_bl  = tl0_bl+   tl0(k)*(z_diff1(k)/z(kinv))
                      enddo
-		     spreading_rate_tke = 1.e3/3600.*(2.0941 * tke2_bl + 0.5078)
-		     !track_width_tke = track_width_tke + dt_stat * spreading_rate0
+
+		     ! TKE Parameterization 
+		     !spreading_rate_tke = 1.e3/3600.*(2.0941 * tke2_bl + 0.5078)
+		     ! TKE*TL Parameterization 
+		     ! spreading_rate_tke = 1.e3/3600.*(0.001 * tke2_bl*tl0_bl + 0.595)
+		     spreading_rate_tke = MAX(0., 1.e3/3600.*(0.967 * log(tke2_bl*tl0_bl) - 4.837))
+
 		     spreading_rate0 = spreading_rate_tke
 		     track_width0 = track_width_tke
+		     trackstat0(3) = tke2_bl 
+		     trackstat0(4) = tl0_bl 
 		     if(masterproc) then
 		       print*,'BL avg. hori. TKE [m2/s2]=',tke2_bl
+		       print*,'BL avg. TL [s]=',tl0_bl
 		     endif
 		  else
 		     track_width0 = 1.e3*track_spreading_rate * (day-shipv2_time0) * 24. 
 		  end if
+		  trackstat0(1) = track_width0
+		  trackstat0(2) = spreading_rate0
+		  call hbuf_put('TrackStat',trackstat0,1.)
 		  if(masterproc) then
 		    print*, 'Track Width [m]=',track_width0
 		    print*, 'Spreading rate [km/hr]=',3600./1.e3*spreading_rate0
