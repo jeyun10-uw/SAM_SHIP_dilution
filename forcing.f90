@@ -5,6 +5,7 @@ use vars
 use params
 use microphysics, only: micro_field, index_water_vapor, total_water, is_water_vapor, nmicro_fields, mk0, mklsadv, mk_ref
 use simple_ocean, only: sst_evolve
+use domain, only: nx_gl, dx 
 
 implicit none
 
@@ -383,6 +384,12 @@ if(dolargescale.and.time.gt.timelargescale) then
 
        ! ramp down amplitude of wtg vertical velocity before stopping
        w_wtg = w_wtg * MAX(0., MIN(1., (wtg_end_time - day ) / wtg_end_ramp ) ) * MAX(0., MIN(1., (day - wtg_start_time) / wtg_start_ramp ) )
+       
+       ! The intensity of wtg is multiplied by fractional area of ship track relative to the domain width 
+       w_wtg = w_wtg * track_width0 / (dx*float(nx_gl))
+       if(mod(nstep,nstat).eq.0) then
+          if(masterproc) write(*,*) 'day, track width/domain width = ',day, track_width0, track_width0/(dx*float(nx_gl)) 
+       endif
 
        ! convert from omega in Pa/s to wsub in m/s
        w_wtg(1:nzm) = -w_wtg(1:nzm)/rho(1:nzm)/ggr
