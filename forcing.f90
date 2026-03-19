@@ -376,7 +376,7 @@ if(dolargescale.and.time.gt.timelargescale) then
           else
             track_width0 = lambda_ship_track_rate * (day - lambda_ship_track_start_time)
           end if
-          lambda_wtg = MAX(lambda_wtg_min,cld_mean * track_width0 / 2.)
+          lambda_wtg = MAX(lambda_wtg_min,cld_mean * track_width0 * 0.5)
        end if
 
        call wtg_james2009(nzm, 100.*pres, tabs_ref_in, qv_ref_in, tabs0, qv0, qn0+qp0, &
