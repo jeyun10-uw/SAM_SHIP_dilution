@@ -1131,7 +1131,7 @@ real :: rh0(nzm)
                 NAC2_mean = nacenv2_numerator / (1.e-16 + nacenv_denominator)
                 NAC_std2 = sqrt(NAC2_mean - NAC_mean2**2)
 
-		if(doShipDilution.and.doAutoDilutionStart) then
+		if(doShipDilution) then !.and.doAutoDilutionStart
 		  NAC_mean_edge = edge_min
 		  if(use_scam_track_width_spreading_rate) then
 		     nn=1
